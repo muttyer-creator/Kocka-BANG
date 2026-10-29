@@ -28,9 +28,6 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
 .code-display{font-size:1.7rem;font-weight:bold;letter-spacing:5px;color:var(--g);background:#120c08;border:2px dashed var(--g);border-radius:8px;padding:6px;text-align:center;margin:6px 0;}
 .qr-box{background:#fff;border-radius:8px;padding:4px;margin:4px auto;width:fit-content;}
 .qr-box img{width:115px;height:115px;display:block;}
-.reorder-list{background:#120c08;border:1px solid var(--b);border-radius:6px;padding:4px;max-height:140px;overflow-y:auto;margin-bottom:8px;}
-.reorder-item{padding:4px;border-bottom:1px solid #22140a;display:flex;justify-content:space-between;align-items:center;font-size:0.8rem;}
-.arrow-btn{background:var(--cl);color:var(--g);border:1px solid var(--b);padding:2px 6px;font-size:0.75rem;border-radius:4px;}
 .switch-row{display:flex;align-items:center;justify-content:space-between;background:#140d07;padding:6px 8px;border-radius:6px;border:1px solid var(--b);margin-bottom:6px;font-size:0.72rem;}
 .switch-row input{transform:scale(1.2);accent-color:var(--g);}
 .game-container{width:100%;max-width:480px;display:flex;flex-direction:column;gap:6px;}
@@ -43,13 +40,15 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
 .char-link{color:var(--g);text-decoration:underline dotted;cursor:pointer;font-weight:bold;}
 .turn-banner{background:var(--cl);border:1px solid var(--b);padding:6px;border-radius:6px;text-align:center;font-size:0.8rem;font-weight:bold;}
 
-/* 2D ASZTAL ÁBRÁZOLÁS */
-.table-2d-wrap{width:100%;height:220px;position:relative;margin:4px 0;}
+/* 2D ASZTAL ÉS TOUCH DRAG */
+.table-2d-wrap{width:100%;height:220px;position:relative;margin:6px 0;touch-action:none;}
 .table-2d-oval{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:130px;height:95px;background:#26160c;border:3px solid var(--b);border-radius:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 10px rgba(0,0,0,0.8);z-index:1;}
-.seat-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;padding:3px 6px;border-radius:6px;background:#1c130b;border:1px solid var(--b);font-size:0.68rem;white-space:nowrap;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,0.6);}
+.seat-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;padding:4px 7px;border-radius:6px;background:#1c130b;border:1px solid var(--b);font-size:0.7rem;white-space:nowrap;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,0.6);touch-action:none;}
+.seat-node.draggable{cursor:grab;}
 .seat-node.host-seat{border-color:var(--host);color:var(--host);}
 .seat-node.active-turn{border-color:var(--g);box-shadow:0 0 8px var(--g);background:#2f1f0e;}
 .seat-node.dead-seat{opacity:0.4;border-color:#555;}
+.seat-node.drag-over{border-color:#fff;background:#44301a;transform:translate(-50%,-50%) scale(1.15);}
 
 .dice-area{display:flex;justify-content:space-between;gap:4px;margin:6px 0;}
 .die{flex:1;aspect-ratio:0.85;background:#fff;border:2px solid #bbb;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#111;cursor:pointer;text-align:center;padding:2px;}
@@ -115,10 +114,13 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
         <option value="3">3 Fő</option><option value="4" selected>4 Fő</option><option value="5">5 Fő</option><option value="6">6 Fő</option><option value="7">7 Fő</option><option value="8">8 Fő</option>
       </select>
     </div>
-    <div id="local-cfg-list" class="reorder-list"></div>
+    <div style="font-size:0.72rem;color:#aaa;text-align:center;margin-bottom:2px;">Húzd az ujjaddal a játékosokat az asztalon a helycseréhez:</div>
+    <!-- 2D ASZTAL ÉS UJJHÚZÁS AZ OFFLINE BEÁLLÍTÁSBAN IS -->
+    <div class="table-2d-wrap" id="local-preview-table"></div>
+
     <div class="switch-row">
       <span><b>Kör iránya:</b></span>
-      <button class="secondary small-btn" id="btn-dir-local" onclick="toggleLocalDir()">↻ Jobbra (Óramutató)</button>
+      <button class="secondary small-btn" id="btn-dir-local" onclick="toggleLocalDir()">↻ Jobbra</button>
     </div>
     <div class="switch-row">
       <span><b>Halottak kasztja titkos a végéig</b><br><small id="local-dead-lbl" style="color:var(--g);">BE</small></span>
@@ -128,8 +130,6 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
       <span><b>Újradobási keret: max 3 kocka (B opció)</b><br><small id="local-switch-lbl" style="color:var(--g);">BE</small></span>
       <input type="checkbox" id="local-rule" checked onchange="document.getElementById('local-switch-lbl').innerText=this.checked?'BE':'KI'">
     </div>
-    <!-- ÉLŐ 2D ELŐNÉZET AZ ÜLÉSRENDHEZ -->
-    <div class="table-2d-wrap" id="local-preview-table" style="height:170px;"></div>
     <button class="w-100" style="margin-bottom:6px;" onclick="startLocalGame()">Indítás 🎲</button>
     <button class="secondary w-100" onclick="showView('menu')">Vissza</button>
   </div>
@@ -139,7 +139,7 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
 <div id="view-online-menu" class="screen hidden">
   <div class="box">
     <h2>ONLINE JÁTÉK</h2>
-    <input type="text" id="my-name-input" placeholder="A neved (pl. Béla)" maxlength="15">
+    <input type="text" id="my-name-input" placeholder="A neved (pl. Béla)" maxlength="15" oninput="saveName(this.value)">
     <button class="w-100" style="margin-bottom:10px;" onclick="createRoom()">Új Szoba Létrehozása ➔</button>
     <div style="text-align:center;color:#aaa;font-size:0.75rem;margin:6px 0;">- VAGY CSATLAKOZZ -</div>
     <input type="text" id="join-code-input" placeholder="4 jegyű kód" maxlength="6" style="text-transform:uppercase;text-align:center;font-weight:bold;letter-spacing:3px;">
@@ -157,11 +157,13 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
       <div class="code-display" id="lobby-code">----</div>
       <div style="font-size:0.72rem;color:#aaa;margin-bottom:4px;">Link: <b style="color:var(--g);">muttyer-creator.github.io/Kocka-BANG</b></div>
     </div>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-      <span style="font-size:0.75rem;color:#aaa;">Ülésrend (Állítsd be a nyilakkal!):</span>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+      <span style="font-size:0.72rem;color:#aaa;">Húzd az ujjaddal az asztalon a helycseréhez:</span>
       <button id="btn-add-bot" class="secondary small-btn" onclick="hostAddBot()">+ 🤖 Bot</button>
     </div>
-    <div class="reorder-list" id="lobby-list"></div>
+    <!-- 2D ASZTAL UJJHÚZÁSSAL A LOBBY-BAN -->
+    <div class="table-2d-wrap" id="lobby-preview-table"></div>
+
     <div class="switch-row" id="host-dir-row">
       <span><b>Kör iránya:</b></span>
       <button class="secondary small-btn" id="btn-dir-lobby" onclick="toggleHostDir()">↻ Jobbra</button>
@@ -174,8 +176,6 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
       <span><b>Újradobási keret: max 3 kocka (B opció)</b><br><small id="switch-status" style="color:var(--g);">BE</small></span>
       <input type="checkbox" id="lobby-rule" checked onchange="toggleLobbyRule(this.checked)">
     </div>
-    <!-- ÉLŐ 2D ASZTAL A LOBBY-BAN -->
-    <div class="table-2d-wrap" id="lobby-preview-table" style="height:170px;"></div>
     <button id="btn-start-online" class="w-100 hidden" onclick="hostStartGame()">Játék Indítása 🎲</button>
     <p id="client-wait-msg" style="text-align:center;font-size:0.8rem;color:#aaa;margin-top:6px;" class="hidden">Várakozás a házigazdára...</p>
   </div>
@@ -201,7 +201,6 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
           <span id="my-pub-role" style="font-size:0.8rem;color:#aaa;"></span>
           <div style="font-size:0.78rem;color:#ccc;">Karakter: <span id="my-char" class="char-link" onclick="openMyChar()">- ℹ️</span></div>
         </div>
-        <!-- HP ÉS NYILAK KÖZVETLENÜL EGYMÁS MELLETT -->
         <div style="display:flex;gap:4px;">
           <div class="badge hp-badge">❤️ <span id="my-hp">8</span>/<span id="my-maxhp">8</span></div>
           <div class="badge arrow-badge">🏹 <span id="my-arrows">0</span> db</div>
@@ -211,7 +210,7 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
       <div style="font-size:0.72rem;color:#bbb;margin-top:3px;cursor:pointer;" id="my-ability" onclick="openMyChar()">Képesség... (Kattints ide ℹ️)</div>
     </div>
 
-    <!-- 2D ASZTAL ÁBRÁZOLÁS A JÁTÉKBAN -->
+    <!-- 2D ASZTAL A JÁTÉK KÖZBEN (OFFLINE ÉS ONLINE IS) -->
     <div class="table-2d-wrap" id="game-2d-table"></div>
 
     <div class="turn-banner" id="turn-banner">...</div>
@@ -313,6 +312,8 @@ const C=[
 
 let mode='NONE',peer=null,isHost=false,myId='local-p',myName='',room='',connH=null,conns=[],G=null;
 
+function saveName(val){ localStorage.setItem('bang_name', val.trim()); }
+
 function showView(v){
   ['menu','local-setup','online-menu','lobby','pass','game','win'].forEach(k=>{
     const el=document.getElementById('view-'+k);
@@ -329,8 +330,10 @@ function showChar(name){
   document.getElementById('modal-char').classList.remove('hidden');
 }
 
-/* 2D ASZTAL RAJZOLÓ MOTOR */
-function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true){
+/* 2D ASZTAL RAJZOLÓ MOTOR: HÁZIGAZDA ALUL (6 ÓRÁNÁL) + UJJHÚZÁS (TOUCH DRAG) */
+let dragSrcIdx = null;
+
+function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, allowDrag=false){
   const c=document.getElementById(containerId); if(!c) return;
   c.innerHTML='';
   const oval=document.createElement('div'); oval.className='table-2d-oval';
@@ -342,14 +345,17 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true){
 
   const N=players.length;
   players.forEach((p,i)=>{
-    const angle = (i/N)*2*Math.PI - Math.PI/2;
+    // Math.PI/2 = 6 ÓRA (LENT KÖZÉPEN) A HÁZIGAZDÁNAK (i=0)
+    const angle = Math.PI/2 + (i/N)*2*Math.PI * (dir||1);
     const left = 50 + 40*Math.cos(angle);
     const top = 50 + 38*Math.sin(angle);
     const node=document.createElement('div');
     const isAct = isLiveGame && (i===activeIdx);
     const isDead = isLiveGame && !p.alive;
-    node.className=`seat-node ${p.isHost?'host-seat':''} ${isAct?'active-turn':''} ${isDead?'dead-seat':''}`;
+    
+    node.className=`seat-node ${p.isHost?'host-seat':''} ${isAct?'active-turn':''} ${isDead?'dead-seat':''} ${allowDrag?'draggable':''}`;
     node.style.left=left+'%'; node.style.top=top+'%';
+    node.dataset.idx=i;
 
     const shStar = (isLiveGame && p.role==='Seriff') ? '⭐ ' : '';
     const hostCrown = p.isHost ? '👑 ' : '';
@@ -361,40 +367,70 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true){
       stats = `<span style="color:#aaa;">${i+1}. Hely</span>`;
     }
     node.innerHTML=`<b>${hostCrown}${shStar}${p.name||p.n}</b>${botIcon}${stats}`;
+
+    // UJJHÚZÁS (TOUCH DRAG) ESEMÉNYEK
+    if(allowDrag){
+      node.onpointerdown = e => {
+        dragSrcIdx = i;
+        node.classList.add('drag-over');
+      };
+      node.onpointerenter = e => {
+        if(dragSrcIdx!==null && dragSrcIdx!==i) node.classList.add('drag-over');
+      };
+      node.onpointerleave = e => node.classList.remove('drag-over');
+      node.onpointerup = e => {
+        const targetNode = document.elementFromPoint(e.clientX, e.clientY)?.closest('.seat-node');
+        if(targetNode && dragSrcIdx!==null){
+          const targetIdx = parseInt(targetNode.dataset.idx);
+          if(!isNaN(targetIdx) && targetIdx!==dragSrcIdx){
+            handleSeatSwap(dragSrcIdx, targetIdx);
+          }
+        }
+        dragSrcIdx = null;
+        document.querySelectorAll('.seat-node').forEach(x=>x.classList.remove('drag-over'));
+      };
+    }
+
     c.appendChild(node);
   });
 }
 
+function handleSeatSwap(fromIdx, toIdx){
+  if(mode==='LOCAL'){
+    const tmp = localCfg[fromIdx];
+    localCfg[fromIdx] = localCfg[toIdx];
+    localCfg[toIdx] = tmp;
+    localCfg.forEach((p,idx)=>p.isHost=(idx===0));
+    render2DTable('local-preview-table', localCfg, 0, localDir, false, true);
+  } else if(isHost){
+    const tmp = G.players[fromIdx];
+    G.players[fromIdx] = G.players[toIdx];
+    G.players[toIdx] = tmp;
+    G.players.forEach((p,idx)=>p.id=idx);
+    renderLobby(); bcast();
+  }
+}
+
 /* OFFLINE */
-let localCfg=[{n:"1. Játékos",bot:false,isHost:true},{n:"2. Játékos",bot:false},{n:"3. Bot",bot:true},{n:"4. Bot",bot:true}];
-let localDir = 1; // 1: Jobbra, -1: Balra
-function setupLocal(){ mode='LOCAL'; showView('local-setup'); renderLocalCfg(); }
+let localCfg=[{n:"1. Játékos",bot:false,isHost:true},{n:"2. Játékos",bot:false,isHost:false},{n:"3. Bot",bot:true,isHost:false},{n:"4. Bot",bot:true,isHost:false}];
+let localDir = 1;
+function setupLocal(){
+  mode='LOCAL'; showView('local-setup');
+  const savedName = localStorage.getItem('bang_name');
+  if(savedName) localCfg[0].n = savedName;
+  renderLocalCfg();
+}
 function toggleLocalDir(){
   localDir = localDir===1 ? -1 : 1;
-  document.getElementById('btn-dir-local').innerText = localDir===1 ? '↻ Jobbra (Óramutató)' : '↺ Balra (Ellentétes)';
-  render2DTable('local-preview-table', localCfg, 0, localDir, false);
+  document.getElementById('btn-dir-local').innerText = localDir===1 ? '↻ Jobbra' : '↺ Balra';
+  render2DTable('local-preview-table', localCfg, 0, localDir, false, true);
 }
 function renderLocalCfg(){
   const cnt=parseInt(document.getElementById('local-count').value);
   while(localCfg.length<cnt) localCfg.push({n:`${localCfg.length+1}. Bot`,bot:true,isHost:false});
   while(localCfg.length>cnt) localCfg.pop();
-  localCfg[0].isHost = true; // Házigazda az 1.
-  const box=document.getElementById('local-cfg-list'); box.innerHTML='';
-  localCfg.forEach((p,i)=>{
-    const r=document.createElement('div'); r.className='reorder-item';
-    r.innerHTML=`<input type="text" value="${p.n}" oninput="localCfg[${i}].n=this.value; updateLocalPreview();" style="margin:0;flex:1;margin-right:4px;padding:4px;">
-    <label style="font-size:0.75rem;margin-right:4px;cursor:pointer;"><input type="checkbox" ${p.bot?'checked':''} onchange="localCfg[${i}].bot=this.checked; updateLocalPreview();"> 🤖</label>
-    <div><button class="arrow-btn" onclick="moveLocal(${i},-1)">▲</button><button class="arrow-btn" onclick="moveLocal(${i},1)">▼</button></div>`;
-    box.appendChild(r);
-  });
-  updateLocalPreview();
-}
-function updateLocalPreview(){ render2DTable('local-preview-table', localCfg, 0, localDir, false); }
-function moveLocal(i,d){
-  const t=i+d; if(t<0||t>=localCfg.length)return;
-  const tmp=localCfg[i]; localCfg[i]=localCfg[t]; localCfg[t]=tmp;
   localCfg.forEach((p,idx)=>p.isHost=(idx===0));
-  renderLocalCfg();
+  render2DTable('local-preview-table', localCfg, 0, localDir, false, true);
 }
 function startLocalGame(){
   const roles=getRoles(localCfg.length); const chars=[...C].sort(()=>Math.random()-0.5);
@@ -407,13 +443,18 @@ function startLocalGame(){
      act:players.findIndex(p=>p.role==='Seriff'),isInit:true,rolls:0,maxRolls:3,budget:3,maxBudget:3,
      dice:Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0})),pending:{s1:0,s2:0,beer:0},actType:null,hist:[]};
   log(`🎮 Játék indult! Seriff: <b>${G.players[G.act].name}</b>`,'event');
-  nextTurnCheck();
+  initTurn();
 }
 
 /* ONLINE */
-function openOnlineMenu(){ showView('online-menu'); }
+function openOnlineMenu(){
+  showView('online-menu');
+  const savedName = localStorage.getItem('bang_name');
+  if(savedName) document.getElementById('my-name-input').value = savedName;
+}
 function createRoom(){
   const n=document.getElementById('my-name-input').value.trim(); if(!n) return alert('Írd be a neved!');
+  saveName(n);
   mode='ONLINE'; myName=n; isHost=true; room=Math.random().toString(36).substr(2,4).toUpperCase();
   peer=new Peer('bang-dice-'+room);
   peer.on('open',id=>{ myId=id; initHostLobby(); });
@@ -459,6 +500,7 @@ function handleHostData(c,d){
 function joinRoom(){
   const n=document.getElementById('my-name-input').value.trim(); const cd=document.getElementById('join-code-input').value.trim().toUpperCase();
   if(!n||!cd) return alert('Add meg a neved és a kódot!');
+  saveName(n);
   mode='ONLINE'; myName=n; isHost=false; room=cd; peer=new Peer();
   peer.on('open',id=>{
     myId=id; connH=peer.connect('bang-dice-'+room);
@@ -482,21 +524,9 @@ function joinRoom(){
   peer.on('error',()=>alert('Nem sikerült csatlakozni!'));
 }
 function renderLobby(){
-  const l=document.getElementById('lobby-list'); l.innerHTML='';
-  G.players.forEach((p,i)=>{
-    const el=document.createElement('div'); el.className='reorder-item';
-    el.innerHTML=`<span>${i+1}. <b>${p.name}</b> ${p.isBot?'🤖':''} ${p.isHost?'👑':''}</span>`+
-      (isHost?`<div><button class="arrow-btn" onclick="moveOnline(${i},-1)">▲</button><button class="arrow-btn" onclick="moveOnline(${i},1)">▼</button></div>`:'');
-    l.appendChild(el);
-  });
-  render2DTable('lobby-preview-table', G.players, 0, G.dir, false);
+  render2DTable('lobby-preview-table', G.players, 0, G.dir, false, isHost);
   const btn=document.getElementById('btn-start-online');
   if(isHost){ btn.disabled=G.players.length<3; btn.innerText=`Indítás (${G.players.length} játékos) 🎲`; }
-}
-function moveOnline(i,d){
-  if(!isHost)return; const t=i+d; if(t<0||t>=G.players.length)return;
-  const tmp=G.players[i]; G.players[i]=G.players[t]; G.players[t]=tmp;
-  G.players.forEach((p,idx)=>p.id=idx); renderLobby(); bcast();
 }
 function bcast(){
   if(!isHost)return; sync();
@@ -506,8 +536,6 @@ function sanitize(peerId){
   const cl=JSON.parse(JSON.stringify(G));
   if(cl.phase==='GAME'){
     cl.players.forEach(p=>{
-      // Kaszt elrejtése: CSAK a Seriff látszik mindenkinek!
-      // Ha halott és nincs bekapcsolva a hideDead, akkor látszik a halott kasztja, egyébként titkos!
       const canSeeDead = !cl.hideDead && !p.alive;
       if((p.peerId!==peerId||p.isBot)&&p.role!=='Seriff'&&!canSeeDead) p.role='❓ Titkos';
     });
@@ -769,7 +797,6 @@ function showWin(t,d){
 }
 function endTurn(){
   G.rnd++;
-  // KÖR IRÁNYA SZERINTI LÉPÉS
   do{ G.act=(G.act + G.dir + G.players.length)%G.players.length; } while(!G.players[G.act].alive);
   initTurn();
 }
@@ -841,7 +868,7 @@ function sync(){
   document.getElementById('my-pub-role').innerText=me.role==='Seriff'?'⭐ (Seriff)':'';
   document.getElementById('my-char').innerText=me.character.n+' ℹ️';
   document.getElementById('my-hp').innerText=me.hp; document.getElementById('my-maxhp').innerText=me.maxHp;
-  document.getElementById('my-arrows').innerText=me.arrows; // NYILAK KÖZVETLENÜL A HP MELLETT!
+  document.getElementById('my-arrows').innerText=me.arrows;
   document.getElementById('my-ability').innerText=`💡 ${me.character.s}`;
 
   if(G.rule){
@@ -853,7 +880,7 @@ function sync(){
   }
 
   // 2D ASZTAL MEGJELENÍTÉSE
-  render2DTable('game-2d-table', G.players, G.act, G.dir, true);
+  render2DTable('game-2d-table', G.players, G.act, G.dir, true, false);
 
   renderDice(isMe);
 
@@ -897,7 +924,6 @@ function renderActPanel(isMe){
     m.innerText=`🎯${d} Lövés (${cnt} maradt): Ki kapja?`;
     getTargets(d).forEach(t=>{
       const btn=document.createElement('button'); btn.className='danger';
-      // SERIFF KIEMELÉSE CÉLZÁSKOR!
       const shTag = (t.role==='Seriff') ? '⭐ (Seriff) ' : '';
       btn.innerText=`${shTag}${t.name} (${t.hp} HP)`;
       btn.onclick=()=>sendAct({t:'TARGET',id:t.id}); b.appendChild(btn);
@@ -919,7 +945,6 @@ function renderActPanel(isMe){
 
 window.onload=()=>{
   const rB=document.getElementById('role-btn');
-  // SZEREP CSAK LENYOMVA TARTVA LÁTHATÓ!
   const rev=e=>{
     if(e) e.preventDefault(); if(!G) return;
     const me=G.players.find(p=>p.peerId===myId)||G.players[G.act];
