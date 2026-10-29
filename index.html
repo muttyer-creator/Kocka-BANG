@@ -32,7 +32,9 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
 .switch-row input{transform:scale(1.2);accent-color:var(--g);}
 .game-container{width:100%;max-width:480px;display:flex;flex-direction:column;gap:6px;}
 
-.live-ticker{background:#140c06;border:1px solid var(--b);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:3px;font-size:0.75rem;}
+/* ÉLŐ ESEMÉNYSÁV (KATTINTHATÓ MÁSODIK HISTORY GOMB) */
+.live-ticker{background:#140c06;border:1px solid var(--b);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:3px;font-size:0.75rem;cursor:pointer;transition:0.15s;}
+.live-ticker:active{background:#2a1b10;border-color:var(--g);}
 .ticker-row{display:flex;align-items:center;gap:6px;line-height:1.2;}
 .ticker-badge{font-size:0.65rem;font-weight:bold;padding:1px 5px;border-radius:4px;flex-shrink:0;}
 .ticker-latest{background:var(--g);color:#000;box-shadow:0 0 4px var(--g);}
@@ -82,7 +84,6 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
 <div id="toast-container"></div>
 <header>
   <div style="display:flex;align-items:center;gap:6px;">
-    <!-- KIRÚGÁS GOMB A BAL FELSŐ SAROKBAN A HÁZIGAZDÁNAK -->
     <button id="btn-kick" class="danger small-btn hidden" onclick="openKickModal()">⚠️ Kirúgás</button>
     <h1>🤠 BANG!</h1>
   </div>
@@ -205,8 +206,10 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
 <!-- 5. JÁTÉKTÉR -->
 <div id="view-game" class="screen hidden">
   <div class="game-container">
-    <div class="live-ticker" id="live-ticker">
-      <div style="color:#888;font-size:0.7rem;">Még nem történt akció.</div>
+    
+    <!-- FELSŐ ÉLŐ ESEMÉNYSÁV: KATTINTHATÓ (MÁSODIK HISTORY GOMB) -->
+    <div class="live-ticker" id="live-ticker" onclick="openHistory()" title="Kattints az eseménynapló megnyitásához">
+      <div style="color:#888;font-size:0.7rem;">Még nem történt akció. (Kattints ide a naplóhoz 📜)</div>
     </div>
 
     <div class="my-card">
@@ -395,7 +398,6 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
     }
     node.innerHTML=`<b>${hostCrown}${shStar}${p.name||p.n}</b>${botIcon}${stats}`;
 
-    // 1 KATTINTÁSRA KARAKTERKÁRTYA MEGJELENÍTÉSE
     node.onclick = () => {
       if(!allowDrag && p.character) showChar(p.character.n);
     };
@@ -505,7 +507,7 @@ function createRoom(){
   const n=document.getElementById('my-name-input').value.trim(); if(!n) return alert('Írd be a neved!');
   saveName(n);
   mode='ONLINE'; myName=n; isHost=true; room=Math.random().toString(36).substr(2,4).toUpperCase();
-  peer=new Peer('bang-dice-'+room);
+  peer = new Peer('bang-dice-' + room);
   peer.on('open',id=>{ myId=id; initHostLobby(); });
   peer.on('connection',c=>{ conns.push(c); c.on('data',d=>handleHostData(c,d)); });
   peer.on('error',()=>alert('Hiba a szoba létrehozásakor!'));
@@ -714,7 +716,6 @@ function handleAct(a,sp){
 function doRollClick(){ sendAct({t:'ROLL'}); }
 function doResolveClick(){ sendAct({t:'RESOLVE'}); }
 
-/* KOCKA VÁLASZTÁS VIZSGÁLATA KÖZVETLENÜL A JÁTÉKOS MOBILJÁN */
 function clientToggleDie(i){
   if(G.isInit) return;
   const d=G.dice[i]; if(d.locked) return;
@@ -775,7 +776,6 @@ function doRoll(){
   mode==='LOCAL'?sync():bcast();
 }
 
-/* NYILAK MEGŐRZÉSE: G.players[pIdx].arrows NÖVEKSZIK ÉS BIZTOSAN MEGMARAD */
 function takeArrow(pIdx){
   G.pool--; G.players[pIdx].arrows++;
   log(`🏹 <b>${G.players[pIdx].name}</b> felvett 1 nyilat!`);
@@ -968,7 +968,6 @@ function sync(){
   document.getElementById('btn-show-log').classList.remove('hidden');
   if(mode==='ONLINE') document.getElementById('btn-react').classList.remove('hidden');
   
-  // KIRÚGÁS GOMB MEGJELENÍTÉSE A HÁZIGAZDÁNAK / OFFLINE
   const canKick = (isHost || mode==='LOCAL') && G.phase==='GAME';
   document.getElementById('btn-kick').classList.toggle('hidden', !canKick);
 
@@ -990,14 +989,13 @@ function sync(){
       ticker.appendChild(row);
     });
   } else {
-    ticker.innerHTML = '<div style="color:#888;font-size:0.7rem;">Még nem történt akció.</div>';
+    ticker.innerHTML = '<div style="color:#888;font-size:0.7rem;">Még nem történt akció. (Kattints ide a naplóhoz 📜)</div>';
   }
 
   const cp=G.players[G.act], isMe=(cp.peerId===myId&&!cp.isBot);
   document.getElementById('bar-turn').innerText=`${cp.name} köre`;
   document.getElementById('turn-banner').innerHTML=cp.isBot?`🤖 <b>${cp.name} (Bot)</b> cselekszik...`:(isMe?`⭐ <b>A TE KÖRÖD VAN!</b> Dobd a kockákat!`:`⏳ <b>${cp.name}</b> cselekszik...`);
 
-  // NYILAK MEGJELENÍTÉSE KÖZVETLENÜL AZ AKTUÁLIS JÁTÉKOS ADATAI ALAPJÁN
   const me = (mode==='LOCAL') ? G.players[G.act] : (G.players.find(p=>p.peerId===myId)||cp);
   document.getElementById('my-name').innerText=me.name;
   document.getElementById('my-pub-role').innerText=me.role==='Seriff'?'⭐ (Seriff)':'';
