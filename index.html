@@ -31,6 +31,15 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
 .switch-row{display:flex;align-items:center;justify-content:space-between;background:#140d07;padding:6px 8px;border-radius:6px;border:1px solid var(--b);margin-bottom:6px;font-size:0.72rem;}
 .switch-row input{transform:scale(1.2);accent-color:var(--g);}
 .game-container{width:100%;max-width:480px;display:flex;flex-direction:column;gap:6px;}
+
+/* ÉLŐ ESEMÉNYSÁV (TOP 3 ESEMÉNY EGYÉRTELMŰ IDŐRENDISÉGGEL) */
+.live-ticker{background:#140c06;border:1px solid var(--b);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:3px;font-size:0.75rem;}
+.ticker-row{display:flex;align-items:center;gap:6px;line-height:1.2;}
+.ticker-badge{font-size:0.65rem;font-weight:bold;padding:1px 5px;border-radius:4px;flex-shrink:0;}
+.ticker-latest{background:var(--g);color:#000;box-shadow:0 0 4px var(--g);}
+.ticker-old{background:#2a1b10;color:#aaa;border:1px solid #442a18;}
+.ticker-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
 .my-card{background:var(--c);border:2px solid var(--g);border-radius:10px;padding:8px 12px;}
 .badge{padding:2px 6px;border-radius:6px;font-weight:bold;font-size:0.78rem;}
 .hp-badge{background:var(--a);color:#fff;}
@@ -41,7 +50,7 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
 .turn-banner{background:var(--cl);border:1px solid var(--b);padding:6px;border-radius:6px;text-align:center;font-size:0.8rem;font-weight:bold;}
 
 /* 2D ASZTAL ÉS TOUCH DRAG */
-.table-2d-wrap{width:100%;height:220px;position:relative;margin:6px 0;touch-action:none;}
+.table-2d-wrap{width:100%;height:220px;position:relative;margin:4px 0;touch-action:none;}
 .table-2d-oval{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:130px;height:95px;background:#26160c;border:3px solid var(--b);border-radius:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 10px rgba(0,0,0,0.8);z-index:1;}
 .seat-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;padding:4px 7px;border-radius:6px;background:#1c130b;border:1px solid var(--b);font-size:0.7rem;white-space:nowrap;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,0.6);touch-action:none;}
 .seat-node.draggable{cursor:grab;}
@@ -92,6 +101,12 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
 <div id="view-menu" class="screen">
   <div class="box">
     <h2>HOGYAN JÁTSZOTOK?</h2>
+    
+    <!-- HÁZIGAZDA HELYREÁLLÍTÓ GOMB (HA MEGSZAKADT VOLNA A MECCS) -->
+    <div id="host-resume-box" class="hidden" style="margin-bottom:10px;">
+      <button class="w-100" style="background:var(--host);color:#000;" onclick="resumeHostSession()">🔄 Visszatérés a szobádba (<span id="resume-code"></span>)</button>
+    </div>
+
     <div class="mode-btn" onclick="setupLocal()">
       <div style="font-size:1.8rem;">📱</div>
       <div><div style="color:var(--g);font-weight:bold;">1 Telefonon (Emberek + Botok)</div><div style="font-size:0.72rem;color:#bbb;">Körbeadós játék, internet nélkül.</div></div>
@@ -115,7 +130,6 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
       </select>
     </div>
     <div style="font-size:0.72rem;color:#aaa;text-align:center;margin-bottom:2px;">Húzd az ujjaddal a játékosokat az asztalon a helycseréhez:</div>
-    <!-- 2D ASZTAL ÉS UJJHÚZÁS AZ OFFLINE BEÁLLÍTÁSBAN IS -->
     <div class="table-2d-wrap" id="local-preview-table"></div>
 
     <div class="switch-row">
@@ -161,7 +175,6 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
       <span style="font-size:0.72rem;color:#aaa;">Húzd az ujjaddal az asztalon a helycseréhez:</span>
       <button id="btn-add-bot" class="secondary small-btn" onclick="hostAddBot()">+ 🤖 Bot</button>
     </div>
-    <!-- 2D ASZTAL UJJHÚZÁSSAL A LOBBY-BAN -->
     <div class="table-2d-wrap" id="lobby-preview-table"></div>
 
     <div class="switch-row" id="host-dir-row">
@@ -194,6 +207,12 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
 <!-- 5. JÁTÉKTÉR -->
 <div id="view-game" class="screen hidden">
   <div class="game-container">
+    
+    <!-- FELSŐ ÉLŐ ESEMÉNYSÁV (TOP 3 TÖRTÉNÉS EGYÉRTELMŰ IDŐRENDISÉGGEL) -->
+    <div class="live-ticker" id="live-ticker">
+      <div style="color:#888;font-size:0.7rem;">Még nem történt akció.</div>
+    </div>
+
     <div class="my-card">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <div>
@@ -210,7 +229,7 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
       <div style="font-size:0.72rem;color:#bbb;margin-top:3px;cursor:pointer;" id="my-ability" onclick="openMyChar()">Képesség... (Kattints ide ℹ️)</div>
     </div>
 
-    <!-- 2D ASZTAL A JÁTÉK KÖZBEN (OFFLINE ÉS ONLINE IS) -->
+    <!-- 2D ASZTAL -->
     <div class="table-2d-wrap" id="game-2d-table"></div>
 
     <div class="turn-banner" id="turn-banner">...</div>
@@ -330,7 +349,7 @@ function showChar(name){
   document.getElementById('modal-char').classList.remove('hidden');
 }
 
-/* 2D ASZTAL RAJZOLÓ MOTOR: HÁZIGAZDA ALUL (6 ÓRÁNÁL) + UJJHÚZÁS (TOUCH DRAG) */
+/* 2D ASZTAL RAJZOLÓ: HÁZIGAZDA ALUL (6 ÓRA) + UJJHÚZÁS (TOUCH DRAG) */
 let dragSrcIdx = null;
 
 function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, allowDrag=false){
@@ -345,7 +364,6 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
 
   const N=players.length;
   players.forEach((p,i)=>{
-    // Math.PI/2 = 6 ÓRA (LENT KÖZÉPEN) A HÁZIGAZDÁNAK (i=0)
     const angle = Math.PI/2 + (i/N)*2*Math.PI * (dir||1);
     const left = 50 + 40*Math.cos(angle);
     const top = 50 + 38*Math.sin(angle);
@@ -368,15 +386,9 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
     }
     node.innerHTML=`<b>${hostCrown}${shStar}${p.name||p.n}</b>${botIcon}${stats}`;
 
-    // UJJHÚZÁS (TOUCH DRAG) ESEMÉNYEK
     if(allowDrag){
-      node.onpointerdown = e => {
-        dragSrcIdx = i;
-        node.classList.add('drag-over');
-      };
-      node.onpointerenter = e => {
-        if(dragSrcIdx!==null && dragSrcIdx!==i) node.classList.add('drag-over');
-      };
+      node.onpointerdown = e => { dragSrcIdx = i; node.classList.add('drag-over'); };
+      node.onpointerenter = e => { if(dragSrcIdx!==null && dragSrcIdx!==i) node.classList.add('drag-over'); };
       node.onpointerleave = e => node.classList.remove('drag-over');
       node.onpointerup = e => {
         const targetNode = document.elementFromPoint(e.clientX, e.clientY)?.closest('.seat-node');
@@ -397,15 +409,11 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
 
 function handleSeatSwap(fromIdx, toIdx){
   if(mode==='LOCAL'){
-    const tmp = localCfg[fromIdx];
-    localCfg[fromIdx] = localCfg[toIdx];
-    localCfg[toIdx] = tmp;
+    const tmp = localCfg[fromIdx]; localCfg[fromIdx] = localCfg[toIdx]; localCfg[toIdx] = tmp;
     localCfg.forEach((p,idx)=>p.isHost=(idx===0));
     render2DTable('local-preview-table', localCfg, 0, localDir, false, true);
   } else if(isHost){
-    const tmp = G.players[fromIdx];
-    G.players[fromIdx] = G.players[toIdx];
-    G.players[toIdx] = tmp;
+    const tmp = G.players[fromIdx]; G.players[fromIdx] = G.players[toIdx]; G.players[toIdx] = tmp;
     G.players.forEach((p,idx)=>p.id=idx);
     renderLobby(); bcast();
   }
@@ -446,7 +454,42 @@ function startLocalGame(){
   initTurn();
 }
 
-/* ONLINE */
+/* ONLINE & HÁZIGAZDA MENTÉS / HELYREÁLLÍTÁS */
+function saveHostSession(){
+  if(isHost && G && G.phase==='GAME'){
+    localStorage.setItem('bang_host_session', JSON.stringify({ room, G, myName }));
+  }
+}
+
+function checkHostSession(){
+  try {
+    const s = JSON.parse(localStorage.getItem('bang_host_session'));
+    if(s && s.room && s.G && s.G.phase==='GAME'){
+      document.getElementById('resume-code').innerText = s.room;
+      document.getElementById('host-resume-box').classList.remove('hidden');
+    }
+  }catch(e){}
+}
+
+function resumeHostSession(){
+  try {
+    const s = JSON.parse(localStorage.getItem('bang_host_session'));
+    if(!s) return;
+    mode='ONLINE'; myName=s.myName||'Házigazda'; isHost=true; room=s.room; G=s.G;
+    peer = new Peer('bang-dice-' + room);
+    peer.on('open', id => {
+      myId = id;
+      document.getElementById('host-resume-box').classList.add('hidden');
+      sync();
+      toast('Visszatértél a szobádba!');
+    });
+    peer.on('connection', c => {
+      conns.push(c);
+      c.on('data', d => handleHostData(c, d));
+    });
+  }catch(e){ alert('Nem sikerült visszatölteni a munkamenetet!'); }
+}
+
 function openOnlineMenu(){
   showView('online-menu');
   const savedName = localStorage.getItem('bang_name');
@@ -519,7 +562,10 @@ function joinRoom(){
       else if(d.t==='EM') toast(`${d.n}: ${d.e}`);
       else if(d.t==='ERR'){ alert(d.m); location.reload(); }
     });
-    connH.on('close',()=>alert('Kapcsolat megszakadt!'));
+    connH.on('close',()=>{
+      toast('⚠️ Kapcsolat megszakadt! Újracsatlakozás 3 mp...');
+      setTimeout(()=>{ if(connH) joinRoom(); }, 3000);
+    });
   });
   peer.on('error',()=>alert('Nem sikerült csatlakozni!'));
 }
@@ -529,7 +575,7 @@ function renderLobby(){
   if(isHost){ btn.disabled=G.players.length<3; btn.innerText=`Indítás (${G.players.length} játékos) 🎲`; }
 }
 function bcast(){
-  if(!isHost)return; sync();
+  if(!isHost)return; sync(); saveHostSession();
   conns.forEach(c=>{ if(c.open) c.send({t:'SYNC',s:sanitize(c.peer)}); });
 }
 function sanitize(peerId){
@@ -672,6 +718,7 @@ function doRoll(){
 
 function takeArrow(pIdx){
   G.pool--; G.players[pIdx].arrows++;
+  log(`🏹 <b>${G.players[pIdx].name}</b> felvett 1 nyilat!`);
   if(G.pool<=0){
     let desc=[];
     G.players.forEach((p,i)=>{
@@ -734,10 +781,12 @@ function botTurn(){
   doRoll();
   setTimeout(()=>{
     if(!cp.alive||G.actType) return;
+    const sheriff=G.players.find(p=>p.role==='Seriff');
+    const wantBeer = cp.hp<=3||(cp.role==='Helyettes'&&sheriff&&sheriff.hp<=4);
     let s=0;
     G.dice.forEach(d=>{
       if(d.locked||(G.rule&&d.rerolls>=2)) return;
-      const keep = (d.face.id==='beer'&&cp.hp<=3)||(d.face.id==='gatling')||(d.face.id.startsWith('shoot')&&cp.role==='Bandita');
+      const keep = (d.face.id==='beer'&&wantBeer)||(d.face.id==='gatling')||(d.face.id.startsWith('shoot')&&cp.role==='Bandita');
       const maxS = G.rule ? G.budget : 5;
       if(!keep && s < maxS){
         const spent = G.maxBudget - G.budget;
@@ -793,14 +842,17 @@ function checkEnd(){
 }
 function showWin(t,d){
   G.phase='GAMEOVER'; G.win={t,d}; log(`🏆 <b>${t}</b> (${d})`,'event');
-  saveArc(t,d); mode==='LOCAL'?sync():bcast();
+  saveArc(t,d); localStorage.removeItem('bang_host_session'); mode==='LOCAL'?sync():bcast();
 }
 function endTurn(){
   G.rnd++;
   do{ G.act=(G.act + G.dir + G.players.length)%G.players.length; } while(!G.players[G.act].alive);
   initTurn();
 }
-function log(txt,type='normal'){ G.hist.unshift({txt,type,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}); }
+function log(txt,type='normal'){
+  if(!G) return;
+  G.hist.unshift({txt,type,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
+}
 function saveArc(t,d){
   try{
     const a=JSON.parse(localStorage.getItem('bang_a')||'[]');
@@ -829,7 +881,7 @@ function openHistory(ch=null){
   document.getElementById('modal-hist').classList.remove('hidden');
 }
 
-/* SYNC & 2D ASZTAL FRISSÍTÉSE */
+/* SYNC, ÉLŐ ESEMÉNYSÁV ÉS 2D ASZTAL */
 function sync(){
   if(!G) return;
   if(G.phase==='LOBBY'){
@@ -859,6 +911,24 @@ function sync(){
   document.getElementById('bar-room-label').style.display=mode==='LOCAL'?'none':'inline';
   document.getElementById('bar-arrows').innerText=G.pool;
 
+  // FELSŐ ÉLŐ ESEMÉNYSÁV (TOP 3 ESEMÉNY EGYÉRTELMŰ JELÖLÉSSEL)
+  const ticker = document.getElementById('live-ticker');
+  if(G.hist && G.hist.length > 0){
+    const top3 = G.hist.slice(0, 3);
+    ticker.innerHTML = '';
+    top3.forEach((item, idx) => {
+      const row = document.createElement('div');
+      row.className = 'ticker-row';
+      const badge = idx === 0 
+        ? '<span class="ticker-badge ticker-latest">● 1. Legújabb</span>' 
+        : `<span class="ticker-badge ticker-old">${idx + 1}.</span>`;
+      row.innerHTML = `${badge} <span class="ticker-text" style="${idx > 0 ? 'opacity:0.75;' : ''}">${item.txt}</span>`;
+      ticker.appendChild(row);
+    });
+  } else {
+    ticker.innerHTML = '<div style="color:#888;font-size:0.7rem;">Még nem történt akció.</div>';
+  }
+
   const cp=G.players[G.act], isMe=(cp.peerId===myId&&!cp.isBot);
   document.getElementById('bar-turn').innerText=`${cp.name} köre`;
   document.getElementById('turn-banner').innerHTML=cp.isBot?`🤖 <b>${cp.name} (Bot)</b> cselekszik...`:(isMe?`⭐ <b>A TE KÖRÖD VAN!</b> Dobd a kockákat!`:`⏳ <b>${cp.name}</b> cselekszik...`);
@@ -879,9 +949,7 @@ function sync(){
     document.getElementById('rule-badge').innerText='(Klasszikus)';
   }
 
-  // 2D ASZTAL MEGJELENÍTÉSE
   render2DTable('game-2d-table', G.players, G.act, G.dir, true, false);
-
   renderDice(isMe);
 
   const ctrls=document.getElementById('turn-ctrls');
@@ -952,6 +1020,8 @@ window.onload=()=>{
   };
   const hid=e=>{ if(e) e.preventDefault(); rB.innerText='👁️ Tartsd nyomva a szereped megnézéséhez'; rB.classList.remove('revealed'); };
   rB.addEventListener('pointerdown',rev); rB.addEventListener('pointerup',hid); rB.addEventListener('pointerleave',hid);
+
+  checkHostSession();
 
   const uP=new URLSearchParams(window.location.search);
   const rm=uP.get('room');
