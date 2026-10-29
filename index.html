@@ -9,8 +9,8 @@
 :root{--bg:#1a120b;--c:#2c1d11;--cl:#422c1b;--g:#f5c531;--t:#f7ede2;--a:#b22222;--b:#6d4c2d;--dmg:#c62828;--host:#00d4ff;}
 *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif;user-select:none;}
 body{background:var(--bg);color:var(--t);min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;}
-header{background:#120c08;padding:8px 12px;border-bottom:2px solid var(--b);display:flex;justify-content:space-between;align-items:center;}
-header h1{color:var(--g);font-size:1.05rem;}
+header{background:#120c08;padding:8px 10px;border-bottom:2px solid var(--b);display:flex;justify-content:space-between;align-items:center;}
+header h1{color:var(--g);font-size:1rem;}
 .status-bar{display:flex;justify-content:space-between;background:var(--cl);padding:6px 10px;font-size:0.8rem;font-weight:bold;}
 .screen{flex:1;padding:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .hidden{display:none!important;}
@@ -22,7 +22,7 @@ button:active{opacity:0.8;}
 button:disabled{opacity:0.4;cursor:not-allowed;}
 button.danger{background:var(--a);color:#fff;}
 button.secondary{background:var(--cl);color:var(--t);border:1px solid var(--b);}
-button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
+button.small-btn{padding:4px 7px;font-size:0.75rem;border-radius:5px;}
 .w-100{width:100%;}
 .mode-btn{display:flex;align-items:center;gap:10px;padding:10px;margin-bottom:8px;border-radius:8px;background:var(--cl);border:2px solid var(--b);color:var(--t);cursor:pointer;}
 .code-display{font-size:1.7rem;font-weight:bold;letter-spacing:5px;color:var(--g);background:#120c08;border:2px dashed var(--g);border-radius:8px;padding:6px;text-align:center;margin:6px 0;}
@@ -32,7 +32,6 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
 .switch-row input{transform:scale(1.2);accent-color:var(--g);}
 .game-container{width:100%;max-width:480px;display:flex;flex-direction:column;gap:6px;}
 
-/* ÉLŐ ESEMÉNYSÁV (KATTINTHATÓ MÁSODIK HISTORY GOMB) */
 .live-ticker{background:#140c06;border:1px solid var(--b);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:3px;font-size:0.75rem;cursor:pointer;transition:0.15s;}
 .live-ticker:active{background:#2a1b10;border-color:var(--g);}
 .ticker-row{display:flex;align-items:center;gap:6px;line-height:1.2;}
@@ -51,8 +50,10 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
 .turn-banner{background:var(--cl);border:1px solid var(--b);padding:6px;border-radius:6px;text-align:center;font-size:0.8rem;font-weight:bold;}
 
 .table-2d-wrap{width:100%;height:220px;position:relative;margin:4px 0;touch-action:none;}
+.table-2d-wrap.editing-mode{border:2px dashed var(--g);border-radius:10px;background:rgba(245,197,49,0.05);}
 .table-2d-oval{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:130px;height:95px;background:#26160c;border:3px solid var(--b);border-radius:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 10px rgba(0,0,0,0.8);z-index:1;}
 .seat-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;padding:4px 7px;border-radius:6px;background:#1c130b;border:1px solid var(--b);font-size:0.7rem;white-space:nowrap;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,0.6);touch-action:none;cursor:pointer;}
+.seat-node.draggable{cursor:grab;}
 .seat-node.host-seat{border-color:var(--host);color:var(--host);}
 .seat-node.active-turn{border-color:var(--g);box-shadow:0 0 8px var(--g);background:#2f1f0e;}
 .seat-node.dead-seat{opacity:0.4;border-color:#555;}
@@ -83,14 +84,15 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
 <body>
 <div id="toast-container"></div>
 <header>
-  <div style="display:flex;align-items:center;gap:6px;">
+  <div style="display:flex;align-items:center;gap:4px;">
     <button id="btn-kick" class="danger small-btn hidden" onclick="openKickModal()">⚠️ Kirúgás</button>
+    <button id="btn-reorder" class="secondary small-btn hidden" onclick="toggleReorderMode()">🪑 Átrendezés</button>
     <h1>🤠 BANG!</h1>
   </div>
-  <div style="display:flex;gap:4px;">
+  <div style="display:flex;gap:3px;">
     <button id="btn-react" class="secondary small-btn hidden" onclick="openEmotes()">💬</button>
-    <button class="secondary small-btn" onclick="openArchive()">🏛️ Meccsek</button>
-    <button id="btn-show-log" class="secondary small-btn hidden" onclick="openHistory()">📜 Napló</button>
+    <button class="secondary small-btn" onclick="openArchive()">🏛️</button>
+    <button id="btn-show-log" class="secondary small-btn hidden" onclick="openHistory()">📜</button>
   </div>
 </header>
 <div id="status-bar" class="status-bar hidden">
@@ -206,9 +208,7 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
 <!-- 5. JÁTÉKTÉR -->
 <div id="view-game" class="screen hidden">
   <div class="game-container">
-    
-    <!-- FELSŐ ÉLŐ ESEMÉNYSÁV: KATTINTHATÓ (MÁSODIK HISTORY GOMB) -->
-    <div class="live-ticker" id="live-ticker" onclick="openHistory()" title="Kattints az eseménynapló megnyitásához">
+    <div class="live-ticker" id="live-ticker" onclick="openHistory()" title="Kattints az eseménynaplóhoz">
       <div style="color:#888;font-size:0.7rem;">Még nem történt akció. (Kattints ide a naplóhoz 📜)</div>
     </div>
 
@@ -278,7 +278,6 @@ button.small-btn{padding:4px 8px;font-size:0.75rem;border-radius:5px;}
   </div>
 </div>
 
-<!-- KIRÚGÁS MODÁL -->
 <div id="modal-kick" class="modal-overlay hidden">
   <div class="modal-box">
     <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--b);padding-bottom:6px;margin-bottom:8px;">
@@ -332,7 +331,7 @@ const C=[
   {n:"Jourdonnais",hp:7,s:"Indiántámadáskor max 1 sebzés.",d:"Legfeljebb 1 életet veszíthet indiántámadáskor!"},
   {n:"Vulture Sam",hp:9,s:"Kieséskor +2 HP.",d:"Bármikor kiesik valaki, Sam azonnal gyógyul +2 életet!"},
   {n:"Pedro Ramirez",hp:8,s:"Sebződéskor eldob 1 nyilat.",d:"Valahányszor életet veszít, azonnal eldob 1 nyilat."},
-  {n:"El Gringo",hp:7,s:"Támadója kap 1 nyilat.",d:"Ha meglövik, a támadója azonnal kap 1 nyilat."},
+  {n:"El Gringo",hp:7,s:"Támadója max 1 nyilat kap a körben.",d:"Ha egy játékos megsebzi El Gringót, a támadó összesen csak 1 nyilat kap a körben, akárhányszor lő bele!"},
   {n:"Jesse Jones",hp:9,s:"<=4 HP-nál a Sör +2-t gyógyít.",d:"Ha élete 4 vagy kevesebb, a Sör 2-t gyógyít rajta."},
   {n:"Suzy Lafayette",hp:8,s:"0 lövés esetén +2 HP.",d:"Ha körében nem tart meg lövést, kap +2 életet."},
   {n:"Lucky Duke",hp:8,s:"+1 újradobási lehetőség.",d:"Keretéből +1 kockát dobhat újra (4 kocka keret)."},
@@ -342,6 +341,7 @@ const C=[
 ];
 
 let mode='NONE',peer=null,isHost=false,myId='local-p',myName='',room='',connH=null,conns=[],G=null;
+let isReorderActive=false;
 
 function saveName(val){ localStorage.setItem('bang_name', val.trim()); }
 
@@ -359,6 +359,25 @@ function showChar(name){
   document.getElementById('mc-hp').innerText=c.hp+' HP';
   document.getElementById('mc-desc').innerText=c.d;
   document.getElementById('modal-char').classList.remove('hidden');
+}
+
+function toggleReorderMode(){
+  isReorderActive = !isReorderActive;
+  const btn = document.getElementById('btn-reorder');
+  const tblWrap = document.getElementById('game-2d-table');
+  if(isReorderActive){
+    btn.innerText = '✅ Kész';
+    btn.style.background = '#2e7d32';
+    btn.style.color = '#fff';
+    tblWrap.classList.add('editing-mode');
+    toast('🪑 Húzd a játékosokat a kívánt helyre!');
+  } else {
+    btn.innerText = '🪑 Átrendezés';
+    btn.style.background = 'var(--cl)';
+    btn.style.color = 'var(--t)';
+    tblWrap.classList.remove('editing-mode');
+  }
+  sync();
 }
 
 /* 2D ASZTAL RAJZOLÓ ÉS TOUCH DRAG */
@@ -423,14 +442,23 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
 }
 
 function handleSeatSwap(fromIdx, toIdx){
-  if(mode==='LOCAL'){
+  const activePeer = G ? G.players[G.act]?.peerId : null;
+  if(mode==='LOCAL' && G && G.phase==='GAME'){
+    const tmp = G.players[fromIdx]; G.players[fromIdx] = G.players[toIdx]; G.players[toIdx] = tmp;
+    G.players.forEach((p,idx)=>p.id=idx);
+    if(activePeer) G.act = G.players.findIndex(p => p.peerId === activePeer);
+    sync();
+  } else if(mode==='LOCAL' && (!G || G.phase!=='GAME')){
     const tmp = localCfg[fromIdx]; localCfg[fromIdx] = localCfg[toIdx]; localCfg[toIdx] = tmp;
     localCfg.forEach((p,idx)=>p.isHost=(idx===0));
     render2DTable('local-preview-table', localCfg, 0, localDir, false, true);
   } else if(isHost){
     const tmp = G.players[fromIdx]; G.players[fromIdx] = G.players[toIdx]; G.players[toIdx] = tmp;
     G.players.forEach((p,idx)=>p.id=idx);
-    renderLobby(); bcast();
+    if(activePeer) G.act = G.players.findIndex(p => p.peerId === activePeer);
+    if(G.phase==='LOBBY') renderLobby();
+    else log('🪑 A Házigazda átrendezte az ülésrendet!','event');
+    bcast();
   }
 }
 
@@ -463,7 +491,7 @@ function startLocalGame(){
   });
   G={room:'OFFLINE',phase:'GAME',dir:localDir,hideDead:document.getElementById('local-hide-dead').checked,
      rule:document.getElementById('local-rule').checked,players,pool:9,rnd:1,
-     act:players.findIndex(p=>p.role==='Seriff'),isInit:true,rolls:0,maxRolls:3,budget:3,maxBudget:3,
+     act:players.findIndex(p=>p.role==='Seriff'),isInit:true,rolls:0,maxRolls:3,budget:3,maxBudget:3,gringoHit:false,
      dice:Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0})),pending:{s1:0,s2:0,beer:0},actType:null,hist:[]};
   log(`🎮 Játék indult! Seriff: <b>${G.players[G.act].name}</b>`,'event');
   initTurn();
@@ -518,7 +546,7 @@ function initHostLobby(){
   const u=`https://muttyer-creator.github.io/Kocka-BANG/?room=${room}`;
   document.getElementById('lobby-qr-img').src=`https://api.qrserver.com/v1/create-qr-code/?size=115x115&data=${encodeURIComponent(u)}`;
   G={room,phase:'LOBBY',dir:1,hideDead:true,rule:true,players:[{id:0,peerId:myId,name:myName,isHost:true,isBot:false}],pool:9,rnd:1,act:0,
-     isInit:true,rolls:0,maxRolls:3,budget:3,maxBudget:3,dice:Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0})),
+     isInit:true,rolls:0,maxRolls:3,budget:3,maxBudget:3,gringoHit:false,dice:Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0})),
      pending:{s1:0,s2:0,beer:0},actType:null,hist:[]};
   renderLobby();
 }
@@ -612,7 +640,7 @@ function toast(t){
   b.className='toast-bubble'; b.innerText=t; c.appendChild(b); setTimeout(()=>b.remove(),3000);
 }
 
-/* KIRÚGÁS FUNKCIÓ */
+/* KIRÚGÁS */
 function openKickModal(){
   const s = document.getElementById('kick-player-select');
   s.innerHTML = '';
@@ -687,6 +715,7 @@ function initTurn(){
   const cp=G.players[G.act];
   G.isInit=true; G.rolls=0; G.maxRolls=cp.character.n==="Lucky Duke"?4:3;
   G.maxBudget=cp.character.n==="Lucky Duke"?4:3; G.budget=G.maxBudget;
+  G.gringoHit=false; // El Gringo védelme körönként resetel
   G.dice=Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0}));
   G.pending={s1:0,s2:0,beer:0}; G.actType=null;
   if(mode==='LOCAL'){ sync(); nextTurnCheck(); }
@@ -791,10 +820,18 @@ function takeArrow(pIdx){
     G.pool=9; checkEnd();
   }
 }
+
 function dmgP(idx,d,att=null){
   const p=G.players[idx]; p.hp=Math.max(0,p.hp-d);
   if(p.character.n==="Pedro Ramirez"&&p.arrows>0){ p.arrows--; G.pool++; log(`🪶 <b>${p.name}</b> eldobott 1 nyilat!`,'event'); }
-  if(p.character.n==="El Gringo"&&att!==null&&att!==idx){ takeArrow(att); log(`🌵 <b>${p.name}</b> miatt a támadó kapott 1 nyilat!`,'damage'); }
+  
+  // EL GRINGO: A TÁMADÓ KÖRÖNKÉNT CSAK MAX 1 NYILAT KAP, AKÁRHÁNYAT IS LŐ BELE!
+  if(p.character.n==="El Gringo"&&att!==null&&att!==idx && !G.gringoHit){
+    G.gringoHit = true;
+    takeArrow(att);
+    log(`🌵 <b>${p.name}</b> miatt a támadó kapott 1 nyilat (körönként max 1)!`,'damage');
+  }
+
   if(p.hp===0){
     p.alive=false; G.pool+=p.arrows; p.arrows=0;
     const roleTxt = (!G.hideDead || p.role==='Seriff') ? ` (${p.role})` : '';
@@ -802,6 +839,7 @@ function dmgP(idx,d,att=null){
     G.players.forEach((s,si)=>{ if(s.alive&&s.character.n==="Vulture Sam"&&si!==idx){ s.hp=Math.min(s.maxHp,s.hp+2); log(`🦅 <b>Vulture Sam</b> +2 HP-t kapott!`,'event'); } });
   }
 }
+
 function startResolve(){
   const cp=G.players[G.act]; let c={arrow:0,dynamite:0,shoot1:0,shoot2:0,beer:0,gatling:0};
   G.dice.forEach(d=>{if(d.face)c[d.face.id]++;});
@@ -968,8 +1006,9 @@ function sync(){
   document.getElementById('btn-show-log').classList.remove('hidden');
   if(mode==='ONLINE') document.getElementById('btn-react').classList.remove('hidden');
   
-  const canKick = (isHost || mode==='LOCAL') && G.phase==='GAME';
-  document.getElementById('btn-kick').classList.toggle('hidden', !canKick);
+  const canAdmin = (isHost || mode==='LOCAL') && G.phase==='GAME';
+  document.getElementById('btn-kick').classList.toggle('hidden', !canAdmin);
+  document.getElementById('btn-reorder').classList.toggle('hidden', !canAdmin);
 
   document.getElementById('bar-room').innerText=G.room;
   document.getElementById('bar-room-label').style.display=mode==='LOCAL'?'none':'inline';
@@ -996,12 +1035,13 @@ function sync(){
   document.getElementById('bar-turn').innerText=`${cp.name} köre`;
   document.getElementById('turn-banner').innerHTML=cp.isBot?`🤖 <b>${cp.name} (Bot)</b> cselekszik...`:(isMe?`⭐ <b>A TE KÖRÖD VAN!</b> Dobd a kockákat!`:`⏳ <b>${cp.name}</b> cselekszik...`);
 
+  // NYILAK MEGJELENÍTÉSE KÖZVETLENÜL AZ AKTUÁLIS JÁTÉKOS ADATAI ALAPJÁN
   const me = (mode==='LOCAL') ? G.players[G.act] : (G.players.find(p=>p.peerId===myId)||cp);
   document.getElementById('my-name').innerText=me.name;
   document.getElementById('my-pub-role').innerText=me.role==='Seriff'?'⭐ (Seriff)':'';
   document.getElementById('my-char').innerText=me.character.n+' ℹ️';
   document.getElementById('my-hp').innerText=me.hp; document.getElementById('my-maxhp').innerText=me.maxHp;
-  document.getElementById('my-arrows').innerText=me.arrows;
+  document.getElementById('my-arrows').innerText=me.arrows; // BIZTOSAN NEM NULLÁZÓDIK LE ÚJRADOBÁSKOR!
   document.getElementById('my-ability').innerText=`💡 ${me.character.s}`;
 
   if(G.rule){
@@ -1012,7 +1052,7 @@ function sync(){
     document.getElementById('rule-badge').innerText='(Klasszikus)';
   }
 
-  render2DTable('game-2d-table', G.players, G.act, G.dir, true, false);
+  render2DTable('game-2d-table', G.players, G.act, G.dir, true, isReorderActive);
   renderDice(isMe);
 
   const ctrls=document.getElementById('turn-ctrls');
