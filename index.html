@@ -261,8 +261,11 @@ button.small-btn{padding:4px 7px;font-size:0.75rem;border-radius:5px;}
       <div style="color:var(--g);font-size:0.8rem;font-weight:bold;margin-bottom:4px;">SZEREPLELEPLEZŐ TABLÓ:</div>
       <div id="win-roster" style="font-size:0.78rem;line-height:1.4;"></div>
     </div>
+    
+    <!-- ÚJ JÁTÉK GOMB: VISSZATÉRÉS A SZOBÁBA ÚJRAINDÍTÁS NÉLKÜL -->
+    <button id="btn-rematch" class="w-100" style="margin-bottom:6px;" onclick="hostReturnToLobby()">🔄 Új játék (Vissza a váróterembe)</button>
     <button class="secondary w-100" style="margin-bottom:6px;" onclick="openHistory()">📜 Eseménynapló</button>
-    <button class="w-100" onclick="location.reload()">Főmenü</button>
+    <button class="secondary w-100" onclick="location.reload()">Kilépés a Főmenübe</button>
   </div>
 </div>
 
@@ -380,8 +383,10 @@ function toggleReorderMode(){
   sync();
 }
 
-/* 2D ASZTAL RAJZOLÓ ÉS TOUCH DRAG */
+/* 2D ASZTAL ÉS TOUCH DRAG + DUPLA KATTINTÁSOS CÉLZÁS */
 let dragSrcIdx = null;
+let lastSeatTapIdx = null;
+let seatTapTimer = null;
 
 function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, allowDrag=false){
   const c=document.getElementById(containerId); if(!c) return;
@@ -417,8 +422,10 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
     }
     node.innerHTML=`<b>${hostCrown}${shStar}${p.name||p.n}</b>${botIcon}${stats}`;
 
+    // KATTINTÁS ÉS DUPLA KATTINTÁS KEZELÉSE
     node.onclick = () => {
-      if(!allowDrag && p.character) showChar(p.character.n);
+      if(allowDrag) return;
+      onSeatNodeClick(i);
     };
 
     if(allowDrag){
@@ -441,6 +448,53 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
   });
 }
 
+function onSeatNodeClick(idx){
+  if(lastSeatTapIdx === idx){
+    // DUPLA KOPPINTÁS TÖRTÉNT!
+    clearTimeout(seatTapTimer);
+    lastSeatTapIdx = null;
+    handleDoubleTapTarget(idx);
+  } else {
+    lastSeatTapIdx = idx;
+    seatTapTimer = setTimeout(() => {
+      // EGYSZERES KOPPINTÁS -> KARAKTERKÁRTYA MEGJELENÍTÉSE
+      lastSeatTapIdx = null;
+      if(!G || !G.actType){
+        const p = G.players[idx];
+        if(p && p.character) showChar(p.character.n);
+      }
+    }, 280);
+  }
+}
+
+function handleDoubleTapTarget(targetIdx){
+  if(!G || !G.actType) return;
+  const cp = G.players[G.act];
+  const isMe = (mode === 'LOCAL') || (cp.peerId === myId && !cp.isBot);
+  if(!isMe) return;
+
+  const target = G.players[targetIdx];
+  if(!target || !target.alive) return;
+
+  if(G.actType.startsWith('shoot')){
+    const dist = G.actType === 'shoot1' ? 1 : 2;
+    const validTargets = getTargets(dist);
+    if(validTargets.some(t => t.id === target.id)){
+      sendAct({ t: 'TARGET', id: target.id });
+      toast(`🎯 Célpont: ${target.name}`);
+    } else {
+      toast(`❌ ${target.name} nincs lőtávolságban!`);
+    }
+  } else if(G.actType === 'beer'){
+    if(target.hp < target.maxHp){
+      sendAct({ t: 'TARGET', id: target.id });
+      toast(`🍺 Gyógyítva: ${target.name}`);
+    } else {
+      toast(`❌ ${target.name} életereje már tele van!`);
+    }
+  }
+}
+
 function handleSeatSwap(fromIdx, toIdx){
   const activePeer = G ? G.players[G.act]?.peerId : null;
   if(mode==='LOCAL' && G && G.phase==='GAME'){
@@ -458,6 +512,21 @@ function handleSeatSwap(fromIdx, toIdx){
     if(activePeer) G.act = G.players.findIndex(p => p.peerId === activePeer);
     if(G.phase==='LOBBY') renderLobby();
     else log('🪑 A Házigazda átrendezte az ülésrendet!','event');
+    bcast();
+  }
+}
+
+/* ÚJ JÁTÉK INDÍTÁSA UGYANAZON A SZOBÁN BELÜL */
+function hostReturnToLobby(){
+  if(mode === 'LOCAL'){
+    showView('local-setup');
+    renderLocalCfg();
+  } else if(isHost){
+    G.phase = 'LOBBY';
+    G.pool = 9; G.rnd = 1; G.act = 0; G.hist = [];
+    G.dice = Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0}));
+    G.pending = {s1:0,s2:0,beer:0}; G.actType = null;
+    G.players.forEach(p => { p.alive = true; p.arrows = 0; p.role = ''; p.hp = 8; p.maxHp = 8; });
     bcast();
   }
 }
@@ -715,7 +784,7 @@ function initTurn(){
   const cp=G.players[G.act];
   G.isInit=true; G.rolls=0; G.maxRolls=cp.character.n==="Lucky Duke"?4:3;
   G.maxBudget=cp.character.n==="Lucky Duke"?4:3; G.budget=G.maxBudget;
-  G.gringoHit=false; // El Gringo védelme körönként resetel
+  G.gringoHit=false;
   G.dice=Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0}));
   G.pending={s1:0,s2:0,beer:0}; G.actType=null;
   if(mode==='LOCAL'){ sync(); nextTurnCheck(); }
@@ -825,11 +894,10 @@ function dmgP(idx,d,att=null){
   const p=G.players[idx]; p.hp=Math.max(0,p.hp-d);
   if(p.character.n==="Pedro Ramirez"&&p.arrows>0){ p.arrows--; G.pool++; log(`🪶 <b>${p.name}</b> eldobott 1 nyilat!`,'event'); }
   
-  // EL GRINGO: A TÁMADÓ KÖRÖNKÉNT CSAK MAX 1 NYILAT KAP, AKÁRHÁNYAT IS LŐ BELE!
   if(p.character.n==="El Gringo"&&att!==null&&att!==idx && !G.gringoHit){
     G.gringoHit = true;
     takeArrow(att);
-    log(`🌵 <b>${p.name}</b> miatt a támadó kapott 1 nyilat (körönként max 1)!`,'damage');
+    log(`🌵 <b>${p.name}</b> miatt a támadó kapott 1 nyilat!`,'damage');
   }
 
   if(p.hp===0){
@@ -983,6 +1051,7 @@ function openHistory(ch=null){
 function sync(){
   if(!G) return;
   if(G.phase==='LOBBY'){
+    showView('lobby');
     renderLobby();
     document.getElementById('btn-dir-lobby').innerText = G.dir===1 ? '↻ Jobbra' : '↺ Balra';
     document.getElementById('lobby-dead-status').innerText = G.hideDead ? 'BE' : 'KI';
@@ -993,6 +1062,8 @@ function sync(){
   }
   if(G.phase==='GAMEOVER'){
     showView('win'); document.getElementById('win-title').innerText=G.win.t; document.getElementById('win-desc').innerText=G.win.d;
+    const canRematch = (isHost || mode === 'LOCAL');
+    document.getElementById('btn-rematch').classList.toggle('hidden', !canRematch);
     const r=document.getElementById('win-roster'); r.innerHTML='';
     G.players.forEach(p=>{
       const d=document.createElement('div');
@@ -1035,13 +1106,12 @@ function sync(){
   document.getElementById('bar-turn').innerText=`${cp.name} köre`;
   document.getElementById('turn-banner').innerHTML=cp.isBot?`🤖 <b>${cp.name} (Bot)</b> cselekszik...`:(isMe?`⭐ <b>A TE KÖRÖD VAN!</b> Dobd a kockákat!`:`⏳ <b>${cp.name}</b> cselekszik...`);
 
-  // NYILAK MEGJELENÍTÉSE KÖZVETLENÜL AZ AKTUÁLIS JÁTÉKOS ADATAI ALAPJÁN
   const me = (mode==='LOCAL') ? G.players[G.act] : (G.players.find(p=>p.peerId===myId)||cp);
   document.getElementById('my-name').innerText=me.name;
   document.getElementById('my-pub-role').innerText=me.role==='Seriff'?'⭐ (Seriff)':'';
   document.getElementById('my-char').innerText=me.character.n+' ℹ️';
   document.getElementById('my-hp').innerText=me.hp; document.getElementById('my-maxhp').innerText=me.maxHp;
-  document.getElementById('my-arrows').innerText=me.arrows; // BIZTOSAN NEM NULLÁZÓDIK LE ÚJRADOBÁSKOR!
+  document.getElementById('my-arrows').innerText=me.arrows;
   document.getElementById('my-ability').innerText=`💡 ${me.character.s}`;
 
   if(G.rule){
