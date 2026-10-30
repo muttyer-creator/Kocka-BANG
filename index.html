@@ -32,12 +32,13 @@ button.small-btn{padding:4px 7px;font-size:0.75rem;border-radius:5px;}
 .switch-row input{transform:scale(1.2);accent-color:var(--g);}
 .game-container{width:100%;max-width:480px;display:flex;flex-direction:column;gap:6px;}
 
-.live-ticker{background:#140c06;border:1px solid var(--b);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:3px;font-size:0.75rem;cursor:pointer;transition:0.15s;}
+/* TÁGASABB ÉLŐ ESEMÉNYSÁV (UTOLSÓ 6 ESEMÉNY) */
+.live-ticker{background:#140c06;border:1px solid var(--b);border-radius:8px;padding:6px 8px;display:flex;flex-direction:column;gap:3px;font-size:0.74rem;cursor:pointer;transition:0.15s;}
 .live-ticker:active{background:#2a1b10;border-color:var(--g);}
-.ticker-row{display:flex;align-items:center;gap:6px;line-height:1.2;}
-.ticker-badge{font-size:0.65rem;font-weight:bold;padding:1px 5px;border-radius:4px;flex-shrink:0;}
+.ticker-row{display:flex;align-items:center;gap:6px;line-height:1.25;}
+.ticker-badge{font-size:0.62rem;font-weight:bold;padding:1px 5px;border-radius:4px;flex-shrink:0;}
 .ticker-latest{background:var(--g);color:#000;box-shadow:0 0 4px var(--g);}
-.ticker-old{background:#2a1b10;color:#aaa;border:1px solid #442a18;}
+.ticker-old{background:#25170d;color:#aaa;border:1px solid #3c2414;}
 .ticker-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
 .my-card{background:var(--c);border:2px solid var(--g);border-radius:10px;padding:8px 12px;}
@@ -146,7 +147,6 @@ button.small-btn{padding:4px 7px;font-size:0.75rem;border-radius:5px;}
       <input type="checkbox" id="local-rule" checked onchange="document.getElementById('local-switch-lbl').innerText=this.checked?'BE':'KI'">
     </div>
 
-    <!-- KÉZI SZEREPBEÁLLÍTÁS OFFLINE -->
     <div class="switch-row">
       <span><b>Kézi szerepbeállítás (1 fő)</b><br><small id="local-fix-lbl" style="color:#aaa;">KIKAPCSOLVA</small></span>
       <input type="checkbox" id="local-fix-toggle" onchange="toggleLocalFixedRole(this.checked)">
@@ -205,7 +205,6 @@ button.small-btn{padding:4px 7px;font-size:0.75rem;border-radius:5px;}
       <input type="checkbox" id="lobby-rule" checked onchange="toggleLobbyRule(this.checked)">
     </div>
 
-    <!-- KÉZI SZEREPBEÁLLÍTÁS ONLINE -->
     <div class="switch-row" id="host-fix-row">
       <span><b>Kézi szerepbeállítás (1 fő)</b><br><small id="lobby-fix-status" style="color:#aaa;">KIKAPCSOLVA</small></span>
       <input type="checkbox" id="lobby-fix-toggle" onchange="toggleHostFixedRole(this.checked)">
@@ -236,6 +235,8 @@ button.small-btn{padding:4px 7px;font-size:0.75rem;border-radius:5px;}
 <!-- 5. JÁTÉKTÉR -->
 <div id="view-game" class="screen hidden">
   <div class="game-container">
+    
+    <!-- FELSŐ ÉLŐ ESEMÉNYSÁV (UTOLSÓ 6 ESEMÉNY EGYMÁS ALATT) -->
     <div class="live-ticker" id="live-ticker" onclick="openHistory()" title="Kattints az eseménynaplóhoz">
       <div style="color:#888;font-size:0.7rem;">Még nem történt akció. (Kattints ide a naplóhoz 📜)</div>
     </div>
@@ -476,14 +477,12 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
 
 function onSeatNodeClick(idx){
   if(lastSeatTapIdx === idx){
-    // GYORS DUPLA KOPPINTÁS -> CÉLZÁS
     clearTimeout(seatTapTimer);
     lastSeatTapIdx = null;
     handleDoubleTapTarget(idx);
   } else {
     lastSeatTapIdx = idx;
     seatTapTimer = setTimeout(() => {
-      // EGYSZERES KOPPINTÁS -> MINDIG MEGMUTATJA A KARAKTERLAPOT
       lastSeatTapIdx = null;
       if(G && G.players && G.players[idx]){
         const p = G.players[idx];
@@ -897,7 +896,6 @@ function initTurn(){
 }
 
 function nextTurnCheck(){
-  if(!G || G.phase !== 'GAME') return;
   const cp=G.players[G.act];
   if(!cp || !cp.alive){ endTurn(); return; }
 
@@ -1065,7 +1063,8 @@ function resolveStep(){
   else if(G.pending.beer>0) G.actType='beer';
   else { G.actType=null; endTurn(); return; }
   mode==='LOCAL'?sync():bcast();
-  if(cp.isBot&&(mode==='LOCAL'||isHost)) setTimeout(botAction,600);
+  const cpActive=G.players[G.act];
+  if(cpActive.isBot&&(mode==='LOCAL'||isHost)) setTimeout(botAction,600);
 }
 
 function applyTarget(tIdx){
@@ -1085,7 +1084,7 @@ function applyTarget(tIdx){
   resolveStep();
 }
 
-/* BOT AI: BIZTOSÍTVA, HOGY HALOTT BOT NEM AKASZTJA MEG A JÁTÉKOT */
+/* BOT AI */
 function botTurn(){
   const cp=G.players[G.act];
   if(!cp || !cp.isBot) return;
@@ -1251,17 +1250,19 @@ function sync(){
   document.getElementById('bar-room-label').style.display=mode==='LOCAL'?'none':'inline';
   document.getElementById('bar-arrows').innerText=G.pool;
 
+  // FELSŐ ÉLŐ ESEMÉNYSÁV (UTOLSÓ 6 ESEMÉNY PROGRESSZÍV HALVÁNYULÁSSAL)
   const ticker = document.getElementById('live-ticker');
   if(G.hist && G.hist.length > 0){
-    const top3 = G.hist.slice(0, 3);
+    const top6 = G.hist.slice(0, 6);
     ticker.innerHTML = '';
-    top3.forEach((item, idx) => {
+    top6.forEach((item, idx) => {
       const row = document.createElement('div');
       row.className = 'ticker-row';
       const badge = idx === 0 
-        ? '<span class="ticker-badge ticker-latest">● 1. Legújabb</span>' 
+        ? '<span class="ticker-badge ticker-latest">● 1.</span>' 
         : `<span class="ticker-badge ticker-old">${idx + 1}.</span>`;
-      row.innerHTML = `${badge} <span class="ticker-text" style="${idx > 0 ? 'opacity:0.75;' : ''}">${item.txt}</span>`;
+      const op = Math.max(0.45, 1 - idx * 0.1);
+      row.innerHTML = `${badge} <span class="ticker-text" style="opacity:${op};">${item.txt}</span>`;
       ticker.appendChild(row);
     });
   } else {
