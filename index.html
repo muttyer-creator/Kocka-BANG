@@ -32,7 +32,7 @@ button.small-btn{padding:4px 7px;font-size:0.75rem;border-radius:5px;}
 .switch-row input{transform:scale(1.2);accent-color:var(--g);}
 .game-container{width:100%;max-width:480px;display:flex;flex-direction:column;gap:6px;}
 
-/* FIX MAGASSÁGÚ ÉLŐ ESEMÉNYSÁV (8 ESEMÉNY, NEM UGRÁL A KÉPERNYŐ!) */
+/* FIX MAGASSÁGÚ ÉS TISZTA ÉLŐ ESEMÉNYSÁV */
 .live-ticker{background:#140c06;border:1px solid var(--b);border-radius:8px;padding:5px 8px;display:flex;flex-direction:column;gap:2px;font-size:0.72rem;cursor:pointer;height:165px;overflow:hidden;box-sizing:border-box;}
 .live-ticker:active{background:#2a1b10;border-color:var(--g);}
 .ticker-row{display:flex;align-items:center;gap:5px;line-height:1.2;height:17px;}
@@ -48,11 +48,11 @@ button.small-btn{padding:4px 7px;font-size:0.75rem;border-radius:5px;}
 .role-reveal-box{display:block;background:#140c06;border:1px dashed var(--g);color:#bbb;padding:7px;border-radius:6px;font-size:0.82rem;font-weight:bold;margin-top:5px;text-align:center;cursor:pointer;touch-action:none;}
 .role-reveal-box.revealed{background:#4a2810;border-style:solid;color:var(--g);}
 .char-link{color:var(--g);text-decoration:underline dotted;cursor:pointer;font-weight:bold;}
-.turn-banner{background:var(--cl);border:1px solid var(--b);padding:5px;border-radius:6px;text-align:center;font-size:0.8rem;font-weight:bold;}
+.turn-banner{background:var(--cl);border:1px solid var(--b);padding:6px;border-radius:6px;text-align:center;font-size:0.8rem;font-weight:bold;min-height:30px;display:flex;align-items:center;justify-content:center;}
 
 .table-2d-wrap{width:100%;height:220px;position:relative;margin:4px 0;touch-action:none;}
 .table-2d-wrap.editing-mode{border:2px dashed var(--g);border-radius:10px;background:rgba(245,197,49,0.05);}
-.table-2d-oval{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:130px;height:95px;background:#26160c;border:3px solid var(--b);border-radius:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 10px rgba(0,0,0,0.8);z-index:1;}
+.table-2d-oval{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:130px;height:95px;background:#26160c;border:3px solid var(--b);border-radius:50px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 10px rgba(0,0,0,0.8);z-index:1;transition:0.3s;}
 .seat-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;padding:3px 6px;border-radius:6px;background:#1c130b;border:1px solid var(--b);font-size:0.68rem;white-space:nowrap;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,0.6);touch-action:none;cursor:pointer;}
 .seat-node.draggable{cursor:grab;}
 .seat-node.host-seat{border-color:var(--host);color:var(--host);}
@@ -70,21 +70,82 @@ button.small-btn{padding:4px 7px;font-size:0.75rem;border-radius:5px;}
 .arrow-btn{background:var(--cl);color:var(--g);border:1px solid var(--b);padding:2px 6px;font-size:0.75rem;border-radius:4px;}
 
 .dice-area{display:flex;justify-content:space-between;gap:4px;margin:6px 0;}
-.die{flex:1;aspect-ratio:0.85;background:#fff;border:2px solid #bbb;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#111;cursor:pointer;text-align:center;padding:2px;}
+.die{flex:1;aspect-ratio:0.85;background:#fff;border:2px solid #bbb;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#111;cursor:pointer;text-align:center;padding:2px;transition:transform 0.15s;}
 .die.locked{border-color:#ff3333;background:#ffcccc;opacity:0.85;}
 .die.maxed{border-color:#777;background:#ddd;opacity:0.8;}
 .die.selected-reroll{border-color:var(--g);background:#fff8dc;transform:translateY(-3px);box-shadow:0 0 6px var(--g);}
 .die-icon{font-size:1.2rem;}
 .die-label{font-size:0.58rem;font-weight:bold;}
 .die-sub{font-size:0.52rem;color:#555;font-weight:bold;}
-.actions-box{background:var(--cl);padding:8px;border-radius:8px;font-size:0.8rem;border:1px solid var(--b);}
+
+.actions-box{background:var(--cl);padding:8px;border-radius:8px;font-size:0.8rem;border:1px solid var(--b);margin-bottom:4px;}
 .targets-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;}
+
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);display:flex;justify-content:center;align-items:center;z-index:1000;padding:12px;}
 .modal-box{background:var(--c);border:2px solid var(--g);border-radius:10px;width:100%;max-width:420px;max-height:85vh;display:flex;flex-direction:column;padding:12px;}
 .history-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px;}
 .history-entry{background:#18100a;border-left:4px solid var(--b);padding:5px 8px;border-radius:4px;font-size:0.78rem;}
 .history-entry.damage{border-left-color:var(--dmg);}
+.history-entry.heal{border-left-color:var(--heal);}
 .history-entry.event{border-left-color:var(--g);}
+
+/* ANIMÁCIÓK (2.1 - 2.5) */
+@keyframes diceRollAnim {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(12deg) scale(1.08); }
+  50% { transform: rotate(-12deg) scale(0.95); }
+  75% { transform: rotate(8deg) scale(1.05); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+.die.rolling { animation: diceRollAnim 0.35s ease-in-out; }
+
+@keyframes floatNumUp {
+  0% { opacity:1; transform:translate(-50%, 0); }
+  100% { opacity:0; transform:translate(-50%, -30px); }
+}
+.float-indicator {
+  position:absolute; z-index:15; font-weight:bold; font-size:1.15rem; pointer-events:none;
+  animation: floatNumUp 0.9s forwards ease-out;
+}
+.float-dmg { color:#ff3333; text-shadow:0 0 4px #000; }
+.float-heal { color:#00ff66; text-shadow:0 0 4px #000; }
+
+@keyframes seatShakeHurt {
+  0%, 100% { transform:translate(-50%, -50%); }
+  20%, 60% { transform:translate(-54%, -50%); background:#551111; }
+  40%, 80% { transform:translate(-46%, -50%); }
+}
+.seat-node.hurt { animation: seatShakeHurt 0.4s ease-in-out; }
+
+@keyframes seatHealGlow {
+  0%, 100% { transform:translate(-50%, -50%); }
+  50% { transform:translate(-50%, -50%) scale(1.1); box-shadow:0 0 14px #00ff66; }
+}
+.seat-node.healed { animation: seatHealGlow 0.5s ease-in-out; }
+
+@keyframes screenAmbushRed {
+  0% { box-shadow: inset 0 0 0 rgba(255,0,0,0); }
+  35% { box-shadow: inset 0 0 80px rgba(180,20,0,0.85); }
+  100% { box-shadow: inset 0 0 0 rgba(255,0,0,0); }
+}
+body.ambush-flash { animation: screenAmbushRed 0.7s ease-out; }
+
+@keyframes screenDynShake {
+  0%, 100% { transform: translate(0,0); }
+  20% { transform: translate(-8px, 6px); background:#3a1500; }
+  40% { transform: translate(8px, -6px); }
+  60% { transform: translate(-6px, -4px); }
+  80% { transform: translate(6px, 4px); }
+}
+body.dynamite-shake { animation: screenDynShake 0.45s ease-in-out; }
+
+@keyframes gatlingSweepAnim {
+  0% { box-shadow: 0 0 0 0 rgba(245,197,49,0.9); border-color:#fff; }
+  50% { box-shadow: 0 0 35px 15px rgba(245,197,49,0.7); }
+  100% { box-shadow: 0 0 60px 25px rgba(245,197,49,0); }
+}
+.table-2d-oval.gatling-sweep { animation: gatlingSweepAnim 0.8s ease-out; }
+
 #toast-container{position:fixed;right:10px;top:60px;z-index:9999;display:flex;flex-direction:column;gap:6px;pointer-events:none;}
 .toast-bubble{background:rgba(20,12,6,0.92);border:1px solid var(--g);color:#fff;padding:6px 12px;border-radius:20px;font-size:0.85rem;font-weight:bold;animation:fadein 0.3s, fadeout 0.5s 2.5s forwards;}
 @keyframes fadein{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
@@ -249,7 +310,6 @@ button.small-btn{padding:4px 7px;font-size:0.75rem;border-radius:5px;}
 <div id="view-game" class="screen hidden">
   <div class="game-container">
     
-    <!-- FELSŐ ÉLŐ ESEMÉNYSÁV (FIX MAGASSÁG: 8 ESEMÉNY, NULLA UGRÁLÁS!) -->
     <div class="live-ticker" id="live-ticker" onclick="openHistory()" title="Kattints az eseménynaplóhoz">
       <div style="color:#888;font-size:0.7rem;">Még nem történt akció. (Kattints ide a naplóhoz 📜)</div>
     </div>
@@ -266,7 +326,6 @@ button.small-btn{padding:4px 7px;font-size:0.75rem;border-radius:5px;}
           <div class="badge arrow-badge">🏹 <span id="my-arrows">0</span> db</div>
         </div>
       </div>
-      <!-- STABIL ÉRINTÉSŰ SZEREP GOMB -->
       <div id="role-btn" class="role-reveal-box" oncontextmenu="return false;">👁️ Tartsd nyomva a szereped megnézéséhez</div>
       <div style="font-size:0.72rem;color:#bbb;margin-top:3px;cursor:pointer;" id="my-ability" onclick="openMyChar()">Képesség... (Kattints ide ℹ️)</div>
     </div>
@@ -274,6 +333,12 @@ button.small-btn{padding:4px 7px;font-size:0.75rem;border-radius:5px;}
     <div class="table-2d-wrap" id="game-2d-table"></div>
 
     <div class="turn-banner" id="turn-banner">...</div>
+
+    <!-- CÉLPONT VÁLASZTÓ PANEL KÖZVETLENÜL A KOCKÁK FELETT -->
+    <div id="act-panel" class="actions-box hidden">
+      <div id="act-msg" style="font-weight:bold;margin-bottom:4px;"></div>
+      <div id="targets-box" class="targets-grid"></div>
+    </div>
 
     <div style="background:var(--c);border:1px solid var(--b);border-radius:10px;padding:8px;">
       <div style="display:flex;justify-content:space-between;font-size:0.75rem;margin-bottom:4px;">
@@ -287,21 +352,16 @@ button.small-btn{padding:4px 7px;font-size:0.75rem;border-radius:5px;}
       </div>
     </div>
 
-    <div id="act-panel" class="actions-box hidden">
-      <div id="act-msg" style="font-weight:bold;margin-bottom:4px;"></div>
-      <div id="targets-box" class="targets-grid"></div>
-    </div>
   </div>
 </div>
 
-<!-- 6. GYŐZELEM (2D LELEPLEZŐ KÖRASZTALLAL) -->
+<!-- 6. GYŐZELEM -->
 <div id="view-win" class="screen hidden">
   <div class="box" style="text-align:center;">
     <div style="font-size:2.8rem;">🏆</div>
     <h2 id="win-title" style="color:var(--g);margin:4px 0;">Győzelem!</h2>
     <p id="win-desc" style="margin-bottom:6px;font-size:0.85rem;"></p>
     
-    <!-- 2D ASZTAL A GYŐZELMI KÉPERNYŐN -->
     <div class="table-2d-wrap" id="win-2d-table" style="height:190px;"></div>
 
     <button id="btn-rematch" class="w-100" style="margin-bottom:6px;" onclick="hostReturnToLobby()">🔄 Új játék (Vissza a váróterembe)</button>
@@ -369,23 +429,30 @@ button.small-btn{padding:4px 7px;font-size:0.75rem;border-radius:5px;}
 
 <script>
 const F=[{id:'arrow',n:'Nyíl',i:'🏹'},{id:'dynamite',n:'Dinamit',i:'🧨'},{id:'shoot1',n:'Lövés 1',i:'🎯1'},{id:'shoot2',n:'Lövés 2',i:'🎯2'},{id:'beer',n:'Sör',i:'🍺'},{id:'gatling',n:'Gatling',i:'💥'}];
+
 const C=[
   {n:"Willy the Kid",hp:8,s:"Már 2 Gatlinggal (💥) elsüti a gépágyút.",d:"Elég 2 Gatling szimbólum a gépágyú elsütéséhez!"},
   {n:"Paul Regret",hp:9,s:"Immunis a Gatlingra.",d:"Soha nem veszít életet a Gatling géppuskától!"},
   {n:"Jourdonnais",hp:7,s:"Indiántámadáskor max 1 sebzés.",d:"Legfeljebb 1 életet veszíthet indiántámadáskor!"},
   {n:"Vulture Sam",hp:9,s:"Kieséskor +2 HP.",d:"Bármikor kiesik valaki, Sam azonnal gyógyul +2 életet!"},
   {n:"Pedro Ramirez",hp:8,s:"Sebződéskor eldob 1 nyilat.",d:"Valahányszor életet veszít, azonnal eldob 1 nyilat."},
-  {n:"El Gringo",hp:7,s:"Támadója max 1 nyilat kap a körben.",d:"Ha egy játékos megsebzi El Gringót, a támadó összesen csak 1 nyilat kap a körben, akárhányszor lő bele!"},
+  {n:"El Gringo",hp:7,s:"Támadója max 1 nyilat kap a körben.",d:"Ha megsebzik, a támadója összesen csak 1 nyilat kap a körben!"},
   {n:"Jesse Jones",hp:9,s:"<=4 HP-nál a Sör +2-t gyógyít.",d:"Ha élete 4 vagy kevesebb, a Sör 2-t gyógyít rajta."},
   {n:"Suzy Lafayette",hp:8,s:"0 lövés esetén +2 HP.",d:"Ha körében nem tart meg lövést, kap +2 életet."},
   {n:"Lucky Duke",hp:8,s:"+1 újradobási lehetőség.",d:"Keretéből +1 kockát dobhat újra (4 kocka keret)."},
   {n:"Black Jack",hp:8,s:"Újradobhatja a dinamitot is.",d:"Újradobhatja a dinamitokat, ha nincs belőle 3 db."},
   {n:"Calamity Janet",hp:8,s:"Lövései felcserélhetők.",d:"A 🎯1 és 🎯2 kockákkal bármelyik célpontot lőheti."},
-  {n:"Rose Doolan",hp:9,s:"+1 lőtáv minden lövésre.",d:"🎯1 lő 1 és 2 távra, 🎯2 lő 2 és 3 távra."}
+  {n:"Rose Doolan",hp:9,s:"+1 lőtáv minden lövésre.",d:"🎯1 lő 1 és 2 távra, 🎯2 lő 2 és 3 távra."},
+  {n:"Bart Cassidy",hp:8,s:"Sebzés helyett nyilat vehet fel.",d:"Ha meglövik, életvesztés helyett felvehet 1 nyilat a készletből (ha még van nyíl)."},
+  {n:"Sid Ketchum",hp:8,s:"Köre elején +1 HP gyógyulás.",d:"A körének kezdetén automatikusan visszanyer 1 életpontot (ha hiányzik)."},
+  {n:"Slab the Killer",hp:8,s:"Sörrel duplázhat egy lövést.",d:"Ha van Sör a kockái között, az egyik lövése 1 helyett 2-t sebez!"},
+  {n:"Kit Carlson",hp:7,s:"Gatlinggal nyilakat dob el.",d:"Minden el nem használt Gatling kockájáért eldobathat 1 nyilat bárkitől a közösbe!"}
 ];
 
 let mode='NONE',peer=null,isHost=false,myId='local-p',myName='',room='',connH=null,conns=[],G=null;
 let isReorderActive=false;
+let currentTurnId = 0;
+let botTimer = null;
 
 function saveName(val){ localStorage.setItem('bang_name', val.trim()); }
 
@@ -424,7 +491,7 @@ function toggleReorderMode(){
   sync();
 }
 
-/* 2D ASZTAL RAJZOLÓ ÉS TOUCH DRAG + KETTŐS ÉRINTÉS + REVEAL ALL AZ ASZTALON */
+/* 2D ASZTAL RAJZOLÓ ÉS ANIMÁCIÓK */
 let dragSrcIdx = null;
 let lastSeatTapIdx = null;
 let seatTapTimer = null;
@@ -449,6 +516,7 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
     const isDead = isLiveGame && !p.alive;
     
     node.className=`seat-node ${p.isHost?'host-seat':''} ${isAct?'active-turn':''} ${isDead?'dead-seat':''} ${allowDrag?'draggable':''}`;
+    node.id = `seat-node-${containerId}-${i}`;
     node.style.left=left+'%'; node.style.top=top+'%';
     node.dataset.idx=i;
 
@@ -458,7 +526,6 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
     let stats = '';
     
     if(revealAll){
-      // GYŐZELMI KÉPERNYŐN LELEPLEZŐ KÖRASZTAL
       const rColor = p.role==='Seriff'?'var(--g)':(p.role==='Bandita'?'var(--a)':(p.role==='Helyettes'?'#4fc3f7':'#ffb74d'));
       stats = `<span style="color:${rColor};font-weight:bold;font-size:0.68rem;">${p.role}</span>
                <span style="font-size:0.58rem;color:#aaa;">${p.alive?'❤️ Él':'☠️'} (${p.character.n})</span>`;
@@ -494,6 +561,57 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
   });
 }
 
+/* ANIMÁCIÓ HELPEREK (2.2, 2.3, 2.4, 2.5) */
+function triggerDamageAnim(targetIdx, amount){
+  const node = document.getElementById(`seat-node-game-2d-table-${targetIdx}`);
+  if(node){
+    node.classList.add('hurt');
+    setTimeout(()=>node.classList.remove('hurt'), 450);
+
+    const fl = document.createElement('div');
+    fl.className = 'float-indicator float-dmg';
+    fl.innerText = `-${amount}`;
+    fl.style.left = node.style.left;
+    fl.style.top = node.style.top;
+    document.getElementById('game-2d-table').appendChild(fl);
+    setTimeout(()=>fl.remove(), 950);
+  }
+}
+
+function triggerHealAnim(targetIdx, amount){
+  const node = document.getElementById(`seat-node-game-2d-table-${targetIdx}`);
+  if(node){
+    node.classList.add('healed');
+    setTimeout(()=>node.classList.remove('healed'), 550);
+
+    const fl = document.createElement('div');
+    fl.className = 'float-indicator float-heal';
+    fl.innerText = `+${amount}`;
+    fl.style.left = node.style.left;
+    fl.style.top = node.style.top;
+    document.getElementById('game-2d-table').appendChild(fl);
+    setTimeout(()=>fl.remove(), 950);
+  }
+}
+
+function triggerAmbushScreenFlash(){
+  document.body.classList.add('ambush-flash');
+  setTimeout(()=>document.body.classList.remove('ambush-flash'), 750);
+}
+
+function triggerDynamiteShake(){
+  document.body.classList.add('dynamite-shake');
+  setTimeout(()=>document.body.classList.remove('dynamite-shake'), 500);
+}
+
+function triggerGatlingSweep(){
+  const oval = document.querySelector('#game-2d-table .table-2d-oval');
+  if(oval){
+    oval.classList.add('gatling-sweep');
+    setTimeout(()=>oval.classList.remove('gatling-sweep'), 850);
+  }
+}
+
 function onSeatNodeClick(idx){
   if(lastSeatTapIdx === idx){
     clearTimeout(seatTapTimer);
@@ -520,7 +638,14 @@ function handleDoubleTapTarget(targetIdx){
   const target = G.players[targetIdx];
   if(!target || !target.alive) return;
 
-  if(G.actType.startsWith('shoot')){
+  if(G.actType === 'kitArrows'){
+    if(target.arrows > 0){
+      sendAct({ t: 'TARGET_KIT', id: target.id });
+      toast(`🪶 Nyíl eldobva: ${target.name}`);
+    } else {
+      toast(`❌ ${target.name} játékosnál nincs nyíl!`);
+    }
+  } else if(G.actType.startsWith('shoot')){
     const dist = G.actType === 'shoot1' ? 1 : 2;
     const validTargets = getTargets(dist);
     if(validTargets.some(t => t.id === target.id)){
@@ -571,7 +696,7 @@ function hostReturnToLobby(){
     G.phase = 'LOBBY';
     G.pool = 9; G.rnd = 1; G.act = 0; G.hist = [];
     G.dice = Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0}));
-    G.pending = {s1:0,s2:0,beer:0}; G.actType = null;
+    G.pending = {s1:0,s2:0,beer:0,kitArrows:0}; G.actType = null;
     G.players.forEach(p => { p.alive = true; p.arrows = 0; p.role = ''; p.hp = 8; p.maxHp = 8; });
     bcast();
   }
@@ -735,8 +860,8 @@ function startLocalGame(){
   });
   G={room:'OFFLINE',phase:'GAME',dir:localDir,hideDead:document.getElementById('local-hide-dead').checked,
      rule:document.getElementById('local-rule').checked,players,pool:9,rnd:1,
-     act:players.findIndex(p=>p.role==='Seriff'),isInit:true,rolls:0,maxRolls:3,budget:3,maxBudget:3,gringoHit:false,
-     dice:Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0})),pending:{s1:0,s2:0,beer:0},actType:null,hist:[]};
+     act:players.findIndex(p=>p.role==='Seriff'),isInit:true,rolls:0,maxRolls:3,budget:3,maxBudget:3,gringoHit:false,gatlingFired:false,
+     dice:Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0})),pending:{s1:0,s2:0,beer:0,kitArrows:0},actType:null,hist:[]};
   log(`🎮 Játék indult! Seriff: <b>${G.players[G.act].name}</b>`,'event');
   initTurn();
 }
@@ -792,8 +917,8 @@ function initHostLobby(){
   G={room,phase:'LOBBY',dir:1,hideDead:true,rule:true,
      fixedRole:{ active: false, playerIdx: 0, role: 'Seriff' },
      players:[{id:0,peerId:myId,name:myName,isHost:true,isBot:false}],pool:9,rnd:1,act:0,
-     isInit:true,rolls:0,maxRolls:3,budget:3,maxBudget:3,gringoHit:false,dice:Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0})),
-     pending:{s1:0,s2:0,beer:0},actType:null,hist:[]};
+     isInit:true,rolls:0,maxRolls:3,budget:3,maxBudget:3,gringoHit:false,gatlingFired:false,dice:Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0})),
+     pending:{s1:0,s2:0,beer:0,kitArrows:0},actType:null,hist:[]};
   renderLobby();
 }
 function toggleHostDir(){
@@ -989,28 +1114,52 @@ function hostStartGame(){
 }
 
 function initTurn(){
+  if(botTimer){ clearTimeout(botTimer); botTimer = null; }
   if(checkEnd()) return;
   const cp=G.players[G.act];
   if(!cp || !cp.alive){ endTurn(); return; }
 
+  currentTurnId++;
+  const thisTurnId = currentTurnId;
+
+  if(cp.character.n === "Sid Ketchum" && cp.hp < cp.maxHp){
+    cp.hp++;
+    log(`💡 <b>Sid Ketchum</b> köre elején gyógyult 1 HP-t! (${cp.hp}/${cp.maxHp})`, 'heal');
+    triggerHealAnim(G.act, 1);
+  }
+
   G.isInit=true; G.rolls=0; G.maxRolls=cp.character.n==="Lucky Duke"?4:3;
   G.maxBudget=cp.character.n==="Lucky Duke"?4:3; G.budget=G.maxBudget;
   G.gringoHit=false;
+  G.gatlingFired=false;
   G.dice=Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0}));
-  G.pending={s1:0,s2:0,beer:0}; G.actType=null;
-  if(mode==='LOCAL'){ sync(); nextTurnCheck(); }
-  else{ bcast(); if(isHost&&cp.isBot) setTimeout(botTurn,800); }
+  G.pending={s1:0,s2:0,beer:0,kitArrows:0}; G.actType=null;
+
+  if(mode==='LOCAL'){
+    sync(); nextTurnCheck();
+  } else {
+    bcast();
+    if(isHost && cp.isBot){
+      botTimer = setTimeout(() => {
+        if(thisTurnId === currentTurnId) botTurn(thisTurnId);
+      }, 800);
+    }
+  }
 }
 
 function nextTurnCheck(){
   if(!G || G.phase !== 'GAME') return;
   const cp=G.players[G.act];
   if(!cp || !cp.alive){ endTurn(); return; }
+  const thisTurnId = currentTurnId;
 
   if(mode==='LOCAL'){
     if(cp.isBot){
       document.getElementById('view-pass').classList.add('hidden');
-      myId=cp.peerId; sync(); setTimeout(botTurn,800);
+      myId=cp.peerId; sync();
+      botTimer = setTimeout(() => {
+        if(thisTurnId === currentTurnId) botTurn(thisTurnId);
+      }, 800);
     } else {
       document.getElementById('view-game').classList.add('hidden');
       document.getElementById('view-pass').classList.remove('hidden');
@@ -1032,7 +1181,10 @@ function handleAct(a,sp){
   }
   else if(a.t==='RESOLVE') startResolve();
   else if(a.t==='TARGET') applyTarget(a.id);
+  else if(a.t==='TARGET_KIT') applyKitArrowTarget(a.id);
   else if(a.t==='SKIP_BEER'){ G.pending.beer=0; resolveStep(); }
+  else if(a.t==='SKIP_KIT'){ G.pending.kitArrows=0; resolveStep(); }
+  else if(a.t==='FIRE_GATLING'){ fireGatling(); }
 }
 function doRollClick(){ sendAct({t:'ROLL'}); }
 function doResolveClick(){ sendAct({t:'RESOLVE'}); }
@@ -1054,9 +1206,14 @@ function clientToggleDie(i){
   sendAct({t:'TOGGLE_DIE', i});
 }
 
+/* 2.1 KOCKADOBÁS ANIMÁCIÓ (SHAKE & ROLL) */
 function doRoll(){
   const cp=G.players[G.act];
   if(!cp || !cp.alive){ endTurn(); return; }
+
+  // Animáció indítása a felületen
+  document.querySelectorAll('.die').forEach(d => d.classList.add('rolling'));
+  setTimeout(() => document.querySelectorAll('.die').forEach(d => d.classList.remove('rolling')), 360);
 
   if(G.isInit){
     G.isInit=false; G.rolls=1;
@@ -1093,9 +1250,11 @@ function doRoll(){
     }
   }
 
+  // DINAMIT 3 DB ROBBANÁS + 2.4 KÉPERNYŐRÁZKÓDÁS
   const dyns = G.dice.filter(d=>d.face&&d.face.id==='dynamite').length;
   if(dyns>=3){
     G.dice.forEach(d=>{if(d.face&&d.face.id==='dynamite')d.locked=true;});
+    triggerDynamiteShake();
     log(`🧨 <b>${cp.name}</b> felrobbant (3 dinamit = -1 HP)!`,'damage');
     dmgP(G.act,1);
     if(checkEnd()) return;
@@ -1108,27 +1267,93 @@ function doRoll(){
       return;
     }
   }
+
+  // GATLING ELLENŐRZÉSE: HA ÖSSZEJÖTT, KÉRDEZZEN RÁ A KÖR KÖZBEN!
+  checkMidTurnGatling();
+
   mode==='LOCAL'?sync():bcast();
+}
+
+function checkMidTurnGatling(){
+  const cp=G.players[G.act];
+  let counts={gatling:0};
+  G.dice.forEach(d=>{ if(d.face&&d.face.id==='gatling') counts.gatling++; });
+  const reqG = cp.character.n==="Willy the Kid"?2:3;
+
+  const canReroll = G.rule 
+    ? (G.budget > 0 && G.dice.some(d=>!d.locked && d.rerolls<2))
+    : (G.rolls < G.maxRolls && G.dice.some(d=>!d.locked));
+
+  if(counts.gatling >= reqG && !G.gatlingFired){
+    if(canReroll){
+      // Megkérdezi, mert még tudna dobni!
+      G.actType = 'askGatling';
+    } else {
+      // Nem tud már dobni, csak elsütni lehet!
+      G.actType = 'forceGatling';
+    }
+  }
+}
+
+function fireGatling(){
+  const cp=G.players[G.act];
+  G.gatlingFired = true;
+  triggerGatlingSweep();
+  log(`💥 <b>${cp.name}</b> elsütötte a Gatlingot! (-1 HP mindenkinek)`,'damage');
+  
+  // Gatling kockák zárolása (felhasználva a gépágyúhoz!)
+  let consumed = 0;
+  const reqG = cp.character.n==="Willy the Kid"?2:3;
+  G.dice.forEach(d=>{
+    if(d.face && d.face.id==='gatling' && consumed < reqG){
+      d.locked = true;
+      consumed++;
+    }
+  });
+
+  G.players.forEach((p,i)=>{
+    if(i!==G.act && p.alive && p.character.n!=="Paul Regret") dmgP(i,1);
+    if(cp.character.n==="Kit Carlson" && p.arrows > 0){ G.pool+=p.arrows; p.arrows=0; }
+  });
+  G.pool+=cp.arrows; cp.arrows=0;
+
+  G.actType = null;
+  if(checkEnd()) return;
+
+  const canReroll = G.rule 
+    ? (G.budget > 0 && G.dice.some(d=>!d.locked && d.rerolls<2))
+    : (G.rolls < G.maxRolls && G.dice.some(d=>!d.locked));
+
+  if(!canReroll){
+    startResolve();
+  } else {
+    mode==='LOCAL'?sync():bcast();
+  }
 }
 
 function takeArrow(pIdx){
   G.pool--; G.players[pIdx].arrows++;
   log(`🏹 <b>${G.players[pIdx].name}</b> felvett 1 nyilat!`);
   if(G.pool<=0){
+    triggerAmbushScreenFlash();
+    log(`🏹 <b>Indiántámadás történt!</b>`,'damage');
     let desc=[];
     G.players.forEach((p,i)=>{
       if(p.alive&&p.arrows>0){
         let d=(p.character.n==="Jourdonnais")?Math.min(1,p.arrows):p.arrows;
-        desc.push(`${p.name} (-${d})`); dmgP(i,d); p.arrows=0;
+        desc.push(`${p.name} (-${d})`);
+        dmgP(i,d);
+        p.arrows=0;
       }
     });
-    log(`🏹 <b>Indiántámadás!</b> ${desc.join(', ')}`,'damage');
     G.pool=9; checkEnd();
   }
 }
 
 function dmgP(idx,d,att=null){
   const p=G.players[idx]; p.hp=Math.max(0,p.hp-d);
+  triggerDamageAnim(idx, d);
+
   if(p.character.n==="Pedro Ramirez"&&p.arrows>0){ p.arrows--; G.pool++; log(`🪶 <b>${p.name}</b> eldobott 1 nyilat!`,'event'); }
   
   if(p.character.n==="El Gringo"&&att!==null&&att!==idx && !G.gringoHit){
@@ -1141,7 +1366,7 @@ function dmgP(idx,d,att=null){
     p.alive=false; G.pool+=p.arrows; p.arrows=0;
     const roleTxt = (!G.hideDead || p.role==='Seriff') ? ` (${p.role})` : '';
     log(`☠️ <b>${p.name} kiesett!</b>${roleTxt}`,'event');
-    G.players.forEach((s,si)=>{ if(s.alive&&s.character.n==="Vulture Sam"&&si!==idx){ s.hp=Math.min(s.maxHp,s.hp+2); log(`🦅 <b>Vulture Sam</b> +2 HP-t kapott!`,'event'); } });
+    G.players.forEach((s,si)=>{ if(s.alive&&s.character.n==="Vulture Sam"&&si!==idx){ s.hp=Math.min(s.maxHp,s.hp+2); log(`🦅 <b>Vulture Sam</b> +2 HP-t kapott!`,'heal'); triggerHealAnim(si,2); } });
   }
 }
 
@@ -1151,14 +1376,30 @@ function startResolve(){
 
   let c={arrow:0,dynamite:0,shoot1:0,shoot2:0,beer:0,gatling:0};
   G.dice.forEach(d=>{if(d.face)c[d.face.id]++;});
-  if(cp.character.n==="Suzy Lafayette"&&!c.shoot1&&!c.shoot2){ cp.hp=Math.min(cp.maxHp,cp.hp+2); log(`🌸 <b>${cp.name}</b> 0 lövés = +2 HP!`,'event'); }
+
+  // Ha nem sütötte el a kör közben, de megvan a 3 Gatling
   const reqG = cp.character.n==="Willy the Kid"?2:3;
-  if(c.gatling>=reqG){
-    log(`💥 <b>${cp.name}</b> elsütötte a Gatlingot! (-1 HP mindenkinek)`,'damage');
-    G.players.forEach((p,i)=>{ if(i!==G.act&&p.alive&&p.character.n!=="Paul Regret") dmgP(i,1); });
-    G.pool+=cp.arrows; cp.arrows=0; if(checkEnd()) return;
+  if(c.gatling >= reqG && !G.gatlingFired){
+    fireGatling();
+    return;
   }
-  G.pending={s1:c.shoot1,s2:c.shoot2,beer:c.beer}; resolveStep();
+
+  if(cp.character.n==="Suzy Lafayette"&&!c.shoot1&&!c.shoot2){ cp.hp=Math.min(cp.maxHp,cp.hp+2); log(`🌸 <b>${cp.name}</b> 0 lövés = +2 HP!`,'heal'); triggerHealAnim(G.act,2); }
+
+  // KIT CARLSON PONTOSÍTÁS:
+  // A Gatlinghez felhasznált 3 kockával már NEM dobhat el nyilat!
+  // Csak a megmaradt / fel nem használt Gatling kockák számítanak!
+  let kitAvail = c.gatling - (G.gatlingFired ? reqG : 0);
+  if(cp.character.n === "Kit Carlson" && kitAvail > 0){
+    G.pending.kitArrows = kitAvail;
+  } else {
+    G.pending.kitArrows = 0;
+  }
+
+  G.pending.s1 = c.shoot1;
+  G.pending.s2 = c.shoot2;
+  G.pending.beer = c.beer;
+  resolveStep();
 }
 
 function resolveStep(){
@@ -1166,10 +1407,12 @@ function resolveStep(){
   const cp=G.players[G.act];
   if(!cp || !cp.alive){ G.actType=null; endTurn(); return; }
 
-  if(G.pending.s1>0) G.actType='shoot1';
-  else if(G.pending.s2>0) G.actType='shoot2';
-  else if(G.pending.beer>0) G.actType='beer';
+  if(G.pending.kitArrows > 0) G.actType='kitArrows';
+  else if(G.pending.s1 > 0) G.actType='shoot1';
+  else if(G.pending.s2 > 0) G.actType='shoot2';
+  else if(G.pending.beer > 0) G.actType='beer';
   else { G.actType=null; endTurn(); return; }
+
   mode==='LOCAL'?sync():bcast();
   const cpActive=G.players[G.act];
   if(cpActive.isBot&&(mode==='LOCAL'||isHost)) setTimeout(botAction,750);
@@ -1180,29 +1423,62 @@ function applyTarget(tIdx){
   if(!cp || !cp.alive){ G.actType=null; endTurn(); return; }
 
   const a=cp.name, t=G.players[tIdx].name;
-  if(G.actType==='shoot1'){ log(`🎯1 <b>${a}</b> ➔ <b>${t}</b> (-1 HP)`,'damage'); dmgP(tIdx,1,G.act); G.pending.s1--; }
-  else if(G.actType==='shoot2'){ log(`🎯2 <b>${a}</b> ➔ <b>${t}</b> (-1 HP)`,'damage'); dmgP(tIdx,1,G.act); G.pending.s2--; }
-  else if(G.actType==='beer'){
-    const h=(G.players[tIdx].character.n==="Jesse Jones"&&G.players[tIdx].hp<=4)?2:1;
-    G.players[tIdx].hp=Math.min(G.players[tIdx].maxHp,G.players[tIdx].hp+h);
-    log(`🍺 <b>${a}</b> sört adott neki: <b>${t}</b> (+${h} HP)`,'event'); G.pending.beer--;
+  let dmgAmount = 1;
+  if(cp.character.n === "Slab the Killer" && G.pending.beer > 0 && G.actType.startsWith('shoot')){
+    dmgAmount = 2; G.pending.beer--;
+    log(`💥 <b>Slab the Killer</b> felhasznált 1 Sört a dupla sebzéshez!`, 'damage');
   }
+
+  const targetP = G.players[tIdx];
+  if(targetP.character.n === "Bart Cassidy" && G.pool >= dmgAmount && G.actType.startsWith('shoot')){
+    targetP.arrows += dmgAmount; G.pool -= dmgAmount;
+    log(`🏹 <b>Bart Cassidy</b> felvett ${dmgAmount} nyilat életvesztés helyett!`, 'event');
+    if(G.actType === 'shoot1') G.pending.s1--; else G.pending.s2--;
+  } else {
+    if(G.actType==='shoot1'){ log(`🎯1 <b>${a}</b> ➔ <b>${t}</b> (-${dmgAmount} HP)`,'damage'); dmgP(tIdx,dmgAmount,G.act); G.pending.s1--; }
+    else if(G.actType==='shoot2'){ log(`🎯2 <b>${a}</b> ➔ <b>${t}</b> (-${dmgAmount} HP)`,'damage'); dmgP(tIdx,dmgAmount,G.act); G.pending.s2--; }
+    else if(G.actType==='beer'){
+      const h=(G.players[tIdx].character.n==="Jesse Jones"&&G.players[tIdx].hp<=4)?2:1;
+      G.players[tIdx].hp=Math.min(G.players[tIdx].maxHp,G.players[tIdx].hp+h);
+      triggerHealAnim(tIdx, h);
+      log(`🍺 <b>${a}</b> sört adott neki: <b>${t}</b> (+${h} HP)`,'heal'); G.pending.beer--;
+    }
+  }
+
   if(checkEnd()) return;
   if(!cp.alive){ G.actType=null; endTurn(); return; }
   resolveStep();
 }
 
+function applyKitArrowTarget(tIdx){
+  const cp = G.players[G.act];
+  const target = G.players[tIdx];
+  if(target && target.arrows > 0){
+    target.arrows--;
+    G.pool++;
+    log(`🪶 <b>Kit Carlson</b> eldobott 1 nyilat tőle: <b>${target.name}</b>`, 'event');
+    G.pending.kitArrows--;
+  }
+  resolveStep();
+}
+
 /* BOT AI */
-function botTurn(){
+function botTurn(tId){
+  if(tId !== currentTurnId || !G || G.phase !== 'GAME') return;
   const cp=G.players[G.act];
-  if(!cp || !cp.isBot) return;
-  if(!cp.alive){ endTurn(); return; }
+  if(!cp || !cp.isBot || !cp.alive) return;
 
   doRoll();
-  setTimeout(()=>{
-    if(!G || G.phase !== 'GAME') return;
+  botTimer = setTimeout(()=>{
+    if(tId !== currentTurnId || !G || G.phase !== 'GAME') return;
     const curr = G.players[G.act];
-    if(!curr || !curr.alive){ endTurn(); return; }
+    if(!curr || !curr.isBot || !curr.alive) return;
+
+    // Ha Gatling összejött, a bot elsüti
+    if(G.actType === 'askGatling' || G.actType === 'forceGatling'){
+      fireGatling();
+      return;
+    }
     if(G.actType) return;
 
     const sheriff=G.players.find(p=>p.role==='Seriff');
@@ -1218,18 +1494,29 @@ function botTurn(){
         else { d.sel=true; s++; }
       }
     });
-    if(s>0){ doRoll(); setTimeout(startResolve,750); } else startResolve();
-  },750);
+    if(s>0){
+      doRoll();
+      botTimer = setTimeout(() => { if(tId === currentTurnId) startResolve(); }, 750);
+    } else {
+      startResolve();
+    }
+  }, 750);
 }
 
-function botAction(){
+function botAction(tId){
+  if(tId !== currentTurnId || !G || G.phase !== 'GAME') return;
   const cp=G.players[G.act];
-  if(!cp || !cp.isBot) return;
-  if(!cp.alive){ G.actType=null; endTurn(); return; }
-  if(!G.actType) return;
+  if(!cp || !cp.isBot || !cp.alive || !G.actType) return;
 
   const sheriff=G.players.find(p=>p.role==='Seriff'), liv=G.players.filter(p=>p.alive);
-  if(G.actType.startsWith('shoot')){
+  
+  if(G.actType === 'kitArrows'){
+    // Kit képességgel a bot eldobja a nyilakat (ha van sajátja, vagy szövetségesétől)
+    let target = G.players.find(p => p.alive && p.arrows > 0 && p.id === cp.id) ||
+                 G.players.find(p => p.alive && p.arrows > 0 && (cp.role==='Helyettes' ? p.role==='Seriff' : true));
+    if(target) applyKitArrowTarget(target.id);
+    else { G.pending.kitArrows = 0; resolveStep(); }
+  } else if(G.actType.startsWith('shoot')){
     const tgts=getTargets(G.actType==='shoot1'?1:2);
     if(!tgts.length) return resolveStep();
     let ch=tgts[0];
@@ -1270,21 +1557,31 @@ function checkEnd(){
   if(!out.length&&!ren.length){ showWin('A Törvény nyert!','Minden bandita és renegát elesett!'); return true; }
   return false;
 }
+
 function showWin(t,d){
+  if(botTimer){ clearTimeout(botTimer); botTimer = null; }
   G.phase='GAMEOVER'; G.win={t,d}; log(`🏆 <b>${t}</b> (${d})`,'event');
   saveArc(t,d); localStorage.removeItem('bang_host_session'); mode==='LOCAL'?sync():bcast();
 }
+
+let isTurnEnding = false;
 function endTurn(){
-  if(checkEnd()) return;
+  if(isTurnEnding) return;
+  isTurnEnding = true;
+  if(botTimer){ clearTimeout(botTimer); botTimer = null; }
+
+  if(checkEnd()){ isTurnEnding = false; return; }
   G.rnd++;
   let loopCount = 0;
   do{
     G.act=(G.act + G.dir + G.players.length)%G.players.length;
     loopCount++;
-    if(loopCount > G.players.length * 2){ checkEnd(); return; }
+    if(loopCount > G.players.length * 2){ checkEnd(); isTurnEnding = false; return; }
   } while(!G.players[G.act].alive);
+  isTurnEnding = false;
   initTurn();
 }
+
 function log(txt,type='normal'){
   if(!G) return;
   G.hist.unshift({txt,type,time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
@@ -1337,8 +1634,6 @@ function sync(){
     showView('win'); document.getElementById('win-title').innerText=G.win.t; document.getElementById('win-desc').innerText=G.win.d;
     const canRematch = (isHost || mode === 'LOCAL');
     document.getElementById('btn-rematch').classList.toggle('hidden', !canRematch);
-    
-    // 2D KÖRASZTAL MEGJELENÍTÉSE AZ ÖSSZES SZEREP LELEPLEZÉSÉVEL!
     render2DTable('win-2d-table', G.players, -1, G.dir, true, false, true);
     return;
   }
@@ -1355,7 +1650,6 @@ function sync(){
   document.getElementById('bar-room-label').style.display=mode==='LOCAL'?'none':'inline';
   document.getElementById('bar-arrows').innerText=G.pool;
 
-  // FELSŐ ÉLŐ ESEMÉNYSÁV (PONTOSAN 8 ESEMÉNY, FIX MAGASSÁG MIATT NULLA UGRÁLÁS!)
   const ticker = document.getElementById('live-ticker');
   if(G.hist && G.hist.length > 0){
     const top8 = G.hist.slice(0, 8);
@@ -1376,7 +1670,15 @@ function sync(){
 
   const cp=G.players[G.act], isMe=(cp.peerId===myId&&!cp.isBot);
   document.getElementById('bar-turn').innerText=`${cp.name} köre`;
-  document.getElementById('turn-banner').innerHTML=cp.isBot?`🤖 <b>${cp.name} (Bot)</b> cselekszik...`:(isMe?`⭐ <b>A TE KÖRÖD VAN!</b> Dobd a kockákat!`:`⏳ <b>${cp.name}</b> cselekszik...`);
+
+  let bannerText = cp.isBot ? `🤖 <b>${cp.name} (Bot)</b> cselekszik...` : (isMe ? `⭐ <b>A TE KÖRÖD VAN!</b> Dobd a kockákat!` : `⏳ <b>${cp.name}</b> cselekszik...`);
+  if(G.actType){
+    if(G.actType === 'askGatling' || G.actType === 'forceGatling') bannerText = `💥 ${cp.name} Gatling elsütés előtt áll!`;
+    else if(G.actType === 'kitArrows') bannerText = `🪶 ${cp.name} nyilat dob el valakitől!`;
+    else if(G.actType.startsWith('shoot')) bannerText = `${cp.name} épp célpontot választ 🎯`;
+    else if(G.actType === 'beer') bannerText = `${cp.name} épp életet ad valakinek 🍺`;
+  }
+  document.getElementById('turn-banner').innerHTML = bannerText;
 
   const me = (mode==='LOCAL') ? G.players[G.act] : (G.players.find(p=>p.peerId===myId)||cp);
   document.getElementById('my-name').innerText=me.name;
@@ -1429,8 +1731,58 @@ function renderDice(isMe){
 
 function renderActPanel(isMe){
   const p=document.getElementById('act-panel'), m=document.getElementById('act-msg'), b=document.getElementById('targets-box');
-  b.innerHTML=''; if(!G.actType){ p.classList.add('hidden'); return; } p.classList.remove('hidden');
-  const cp=G.players[G.act]; if(!isMe){ m.innerText=`${cp.name} ${cp.isBot?'(Bot) ':''}épp választ...`; return; }
+  b.innerHTML='';
+  if(!G.actType || !isMe){
+    p.classList.add('hidden');
+    return;
+  }
+  p.classList.remove('hidden');
+
+  // GATLING KÉRDÉS: ELSÜTÖD MOST?
+  if(G.actType === 'askGatling'){
+    m.innerText = '💥 Összejött a Gatling! Elsütöd most?';
+    const btnFire = document.createElement('button');
+    btnFire.className = 'danger';
+    btnFire.innerText = '💥 Igen, elsütöm most!';
+    btnFire.onclick = () => sendAct({ t: 'FIRE_GATLING' });
+    b.appendChild(btnFire);
+
+    const btnSkip = document.createElement('button');
+    btnSkip.className = 'secondary';
+    btnSkip.innerText = '🎲 Nem, még újradobok!';
+    btnSkip.onclick = () => { G.actType = null; sync(); };
+    b.appendChild(btnSkip);
+    return;
+  }
+
+  if(G.actType === 'forceGatling'){
+    m.innerText = '💥 Nincs több dobásod: A Gatling elsütése kötelező!';
+    const btnFire = document.createElement('button');
+    btnFire.className = 'danger w-100';
+    btnFire.innerText = '💥 Gatling Elsütése!';
+    btnFire.onclick = () => sendAct({ t: 'FIRE_GATLING' });
+    b.appendChild(btnFire);
+    return;
+  }
+
+  // KIT CARLSON NYÍLELDOBÁS VÁLASZTÓ
+  if(G.actType === 'kitArrows'){
+    m.innerText = `🪶 Kit Carlson: Kinek a nyilát dobod el? (Még ${G.pending.kitArrows} maradt)`;
+    G.players.forEach(pl => {
+      if(pl.alive && pl.arrows > 0){
+        const btn = document.createElement('button');
+        btn.innerText = `${pl.name} (🏹 ${pl.arrows} nyíl)`;
+        btn.onclick = () => sendAct({ t: 'TARGET_KIT', id: pl.id });
+        b.appendChild(btn);
+      }
+    });
+    const sk = document.createElement('button');
+    sk.className = 'secondary';
+    sk.innerText = 'Kihagyás';
+    sk.onclick = () => sendAct({ t: 'SKIP_KIT' });
+    b.appendChild(sk);
+    return;
+  }
 
   if(G.actType.startsWith('shoot')){
     const d=G.actType==='shoot1'?1:2, cnt=d===1?G.pending.s1:G.pending.s2;
@@ -1456,7 +1808,7 @@ function renderActPanel(isMe){
   }
 }
 
-/* STABIL, UJJHOZ RÖGZÍTETT SZEREPMEGTEKINTÉS */
+/* STABIL SZEREPMEGTEKINTÉS */
 window.onload=()=>{
   const roleBox = document.getElementById('role-btn');
   const reveal = () => {
