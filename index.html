@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>BANG! Kockajáték v2.4</title>
+<title>BANG! Kockajáték v2.5</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
 :root{--bg:#1a120b;--c:#2c1d11;--cl:#422c1b;--g:#f5c531;--t:#f7ede2;--a:#b22222;--b:#6d4c2d;--dmg:#c62828;--heal:#2e7d32;--host:#00d4ff;}
@@ -33,7 +33,7 @@ button.small-btn{padding:3px 6px;font-size:0.72rem;border-radius:5px;}
 .switch-row{display:flex;align-items:center;justify-content:space-between;background:#140d07;padding:5px 7px;border-radius:6px;border:1px solid var(--b);margin-bottom:5px;font-size:0.7rem;}
 .switch-row input{transform:scale(1.15);accent-color:var(--g);}
 
-/* KOMPAKT JÁTÉK MEZŐ (GÖRGETÉS NÉLKÜL) */
+/* KOMPAKT JÁTÉK MEZŐ */
 .game-container{width:100%;max-width:460px;height:100%;display:flex;flex-direction:column;justify-content:space-between;gap:4px;}
 
 .live-ticker{background:#140c06;border:1px solid var(--b);border-radius:8px;padding:4px 8px;display:flex;flex-direction:column;gap:2px;font-size:0.72rem;cursor:pointer;height:160px;min-height:160px;max-height:160px;overflow:hidden;box-sizing:border-box;flex-shrink:0;}
@@ -62,20 +62,19 @@ button.small-btn{padding:3px 6px;font-size:0.72rem;border-radius:5px;}
 .seat-node.dead-seat{opacity:.35;border-color:#555;filter:grayscale(1);}
 .seat-node.drag-over{border-color:#fff;background:#44301a;transform:translate(-50%,-50%) scale(1.15);}
 
-/* SAJÁT KARAKTER KIEMELT ZÖLD KERETE */
 .seat-node.my-seat{border:2px solid #00ff66!important;box-shadow:0 0 10px rgba(0,255,102,.7)!important;background:#122912!important;}
 .my-seat-tag{color:#00ff66;font-weight:900;font-size:0.6rem;margin-left:2px;}
 
 .anim-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:12;}
 
-/* DOBOGÓ SZÍV PULZÁLÁS (3 VAGY KEVESEBB HP) */
+/* DOBOGÓ SZÍV PULZÁLÁS (<= 3 HP) */
 @keyframes heartbeatPulse{0%{transform:translate(-50%,-50%) scale(1);border-color:#882222}14%{transform:translate(-50%,-50%) scale(1.12);border-color:#ff2200;box-shadow:0 0 12px #ff0000}28%{transform:translate(-50%,-50%) scale(1)}42%{transform:translate(-50%,-50%) scale(1.16);border-color:#ff2200;box-shadow:0 0 16px #ff0000}70%{transform:translate(-50%,-50%) scale(1)}100%{transform:translate(-50%,-50%) scale(1)}}
 .seat-node.low-hp-pulse{animation:heartbeatPulse 1.25s infinite ease-in-out;}
 
 @keyframes arrowDangerPulse{0%{transform:scale(1);color:#ff5555}100%{transform:scale(1.12);color:#ff0000;text-shadow:0 0 12px #ff0000}}
 .danger-arrow-glow{animation:arrowDangerPulse .75s infinite alternate ease-in-out;}
 
-/* 2 DINAMIT VESZÉLYJELZÉS MINDENKINÉL */
+/* 2 DINAMIT VESZÉLYJELZÉS */
 @keyframes dynWarningFlicker{0%,100%{box-shadow:inset 0 0 18px rgba(255,50,0,.45);border-color:rgba(255,80,0,.6);}50%{box-shadow:inset 0 0 45px rgba(255,20,0,.9),0 0 20px #ff3300;border-color:#ff2200;}}
 body.dyn-danger-warning{animation:dynWarningFlicker 0.75s infinite alternate ease-in-out;}
 .dyn-warning-badge{position:fixed;top:38px;left:50%;transform:translateX(-50%);background:#9e1c0c;border:2px solid #ffcc00;color:#fff;font-size:0.75rem;font-weight:bold;padding:4px 12px;border-radius:20px;box-shadow:0 0 12px #ff2200;z-index:9998;pointer-events:none;white-space:nowrap;animation:sparkFlicker .6s infinite ease-in-out;}
@@ -123,9 +122,13 @@ body.dyn-danger-warning{animation:dynWarningFlicker 0.75s infinite alternate eas
 @keyframes seatHealGlow{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-50%,-50%) scale(1.15);box-shadow:0 0 16px #00ff66}}
 .seat-node.healed{animation:seatHealGlow .55s ease-in-out;}
 
-/* 1. ÖTLET: CÉLKERESZT ANIMÁCIÓ */
+/* CÉLKERESZT ANIMÁCIÓ */
 @keyframes crosshairZoom{0%{opacity:0;transform:translate(-50%,-50%) scale(2.2) rotate(45deg);}50%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg);}80%{opacity:1;transform:translate(-50%,-50%) scale(1.08);}100%{opacity:0;transform:translate(-50%,-50%) scale(0.8);}}
 .crosshair-target{position:absolute;font-size:1.6rem;color:#ff2200;text-shadow:0 0 8px #ff0000;pointer-events:none;z-index:29;animation:crosshairZoom 0.5s ease-out forwards;}
+
+/* EMOJI BUBORÉK A KARAKTER FEJE FELETT */
+@keyframes emoteFloatUp{0%{opacity:0;transform:translate(-50%,10px) scale(0.6)}20%{opacity:1;transform:translate(-50%,-16px) scale(1.25)}70%{opacity:1;transform:translate(-50%,-20px) scale(1)}100%{opacity:0;transform:translate(-50%,-35px) scale(0.8)}}
+.floating-emote-bubble{position:absolute;background:rgba(20,12,6,.92);border:2px solid var(--g);border-radius:20px;padding:2px 7px;font-size:1.3rem;box-shadow:0 0 8px #000;pointer-events:none;z-index:35;animation:emoteFloatUp 2.2s forwards ease-out;}
 
 @keyframes seatDyingAnim{0%{transform:translate(-50%,-50%) scale(1);filter:none;}50%{transform:translate(-50%,-50%) scale(1.25) rotate(6deg);filter:brightness(2) contrast(2);}100%{transform:translate(-50%,-50%) scale(0.9);filter:grayscale(1) opacity(0.5);}}
 .seat-node.dying{animation:seatDyingAnim 1.2s forwards ease-in-out;}
@@ -171,12 +174,13 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
 <div id="toast-container"></div>
 <header>
   <div style="display:flex;align-items:center;gap:4px;">
+    <!-- KIZÁRÓLAG A HÁZIGAZDA LÁTJA A SAROKBAN -->
     <button id="btn-kick" class="danger small-btn hidden" onclick="openKickModal()">⚠️ Kirúgás</button>
     <button id="btn-reorder" class="secondary small-btn hidden" onclick="toggleReorderMode()">🪑 Átrendezés</button>
-    <h1>🤠 BANG! <span style="font-size:0.62rem;color:#00ff66;background:#052405;padding:1px 5px;border-radius:4px;border:1px solid #00aa44;">v2.4</span></h1>
+    <h1>🤠 BANG! <span style="font-size:0.62rem;color:#00ff66;background:#052405;padding:1px 5px;border-radius:4px;border:1px solid #00aa44;">v2.5</span></h1>
   </div>
   <div style="display:flex;align-items:center;gap:4px;">
-    <!-- SZOBA KÓD JELVÉNY A TESZT GOMB HELYÉN -->
+    <!-- SZOBAKÓD JELVÉNY A FEJLÉCBEN -->
     <span id="hdr-room-badge" style="background:#22150c;border:1px solid var(--b);color:var(--g);font-size:0.72rem;font-weight:bold;padding:2px 6px;border-radius:5px;">Szoba: <b id="hdr-room">----</b></span>
     <button id="btn-mute" class="secondary small-btn" onclick="toggleMute()">🔊</button>
     <button id="btn-react" class="secondary small-btn hidden" onclick="openEmotes()">💬</button>
@@ -392,15 +396,49 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
   </div>
 </div>
 
+<!-- 3 OPCIÓS KIRÚGÁSI MODÁL -->
 <div id="modal-kick" class="modal-overlay hidden">
   <div class="modal-box">
     <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--b);padding-bottom:6px;margin-bottom:8px;">
-      <h3 style="color:var(--a);">⚠️ Játékos kirúgása</h3><button class="secondary small-btn" onclick="closeM('modal-kick')">✕</button>
+      <h3 style="color:var(--a);">⚠️ Játékos kezelése / Kirúgás</h3><button class="secondary small-btn" onclick="closeM('modal-kick')">✕</button>
     </div>
-    <div style="font-size:0.8rem;margin-bottom:8px;">Válaszd ki, kit akarsz eltávolítani a játékból:</div>
+    <div style="font-size:0.8rem;margin-bottom:8px;">Válaszd ki a játékost:</div>
     <select id="kick-player-select" style="margin-bottom:10px;"></select>
-    <button class="danger w-100" onclick="executeKickFlow()">Kirúgás végrehajtása</button>
-    <button class="secondary w-100" style="margin-top:6px;" onclick="closeM('modal-kick')">Mégse</button>
+
+    <!-- 1. LÉPÉS: A 3 OPCIÓ -->
+    <div id="kick-step-options" style="display:flex;flex-direction:column;gap:6px;">
+      <button class="danger w-100" style="text-align:left;padding:8px;" onclick="selectKickAction('REMOVE')">
+        <b>🚫 1. Teljes eltávolítás a szobából</b><br>
+        <small style="font-size:0.7rem;color:#ffdddd;">Semmi nyoma nem marad, azonnal kikerül a játékból/szobából.</small>
+      </button>
+
+      <button class="secondary w-100" style="text-align:left;padding:8px;background:#193242;border-color:var(--host);color:var(--host);" onclick="selectKickAction('BOT')">
+        <b>🤖 2. Egy Bot vegye át a helyét</b><br>
+        <small style="font-size:0.7rem;color:#bde4f4;">A játékos adatai megmaradnak, és egy Bot játszik tovább helyette.</small>
+      </button>
+
+      <button class="secondary w-100" style="text-align:left;padding:8px;background:#2a1010;border-color:var(--a);color:#ff9999;" onclick="selectKickAction('DIE')">
+        <b>💀 3. Kiesés (Mintha meghalt volna)</b><br>
+        <small style="font-size:0.7rem;color:#ddd;">0 HP-ra kerül, eldobja nyilait, lefut a halál szabály.</small>
+      </button>
+    </div>
+
+    <!-- 2. LÉPÉS (HA TELJES ELTÁVOLÍTÁS VOLT JÁTÉK KÖZBEN): SZEREP-DÖNTÉS -->
+    <div id="kick-role-decide" class="hidden" style="margin-top:6px;">
+      <div style="font-size:0.78rem;font-weight:bold;color:var(--g);margin-bottom:6px;">Mi történjen a megmaradt játékosok szerepeivel?</div>
+      <button class="secondary w-100" style="margin-bottom:5px;font-size:0.75rem;" onclick="finalizeKickRemoval('KEEP')">A) Szerepek maradnak a régiek</button>
+      <button class="secondary w-100" style="margin-bottom:5px;font-size:0.75rem;" onclick="finalizeKickRemoval('RESHUFFLE')">B) Automatikus újrasorsolás</button>
+      <button class="w-100" style="font-size:0.75rem;" onclick="showManualRoleAssign()">C) Kézi szereposztás a Házigazda által ➔</button>
+    </div>
+
+    <!-- 3. LÉPÉS: KÉZI SZEREPOSZTÁS PANEL -->
+    <div id="kick-manual-roles" class="hidden" style="margin-top:6px;">
+      <div style="font-size:0.78rem;font-weight:bold;color:var(--g);margin-bottom:4px;">Állítsd be a megmaradt játékosok szerepét:</div>
+      <div id="manual-role-list" style="max-height:140px;overflow-y:auto;display:flex;flex-direction:column;gap:4px;margin-bottom:6px;"></div>
+      <button class="w-100" onclick="applyManualRoleAssignments()">Szerepek mentése és játék folytatása ✅</button>
+    </div>
+
+    <button class="secondary w-100" style="margin-top:8px;" onclick="closeM('modal-kick')">Mégse</button>
   </div>
 </div>
 
@@ -464,6 +502,7 @@ let mode='NONE',peer=null,isHost=false,myId='local-p',myName='',room='',connH=nu
 let isReorderActive=false, currentTurnId=0, botTimer=null;
 let audioCtx=null, isMuted=false;
 let isAmbushLock=false;
+let pendingKickTargetIdx=null;
 
 function initAudio(){
   if(!audioCtx){
@@ -476,7 +515,7 @@ function toggleMute(){
   isMuted=!isMuted;
   localStorage.setItem('bang_local_muted', isMuted?'1':'0');
   document.getElementById('btn-mute').innerText=isMuted?'🔇':'🔊';
-  toast(isMuted?'🔇 Hangok némítva a telefonodon':'🔊 Hangok bekapcsolva');
+  toast(isMuted?'🔇 Hangok némítva a készülékeden':'🔊 Hangok bekapcsolva');
 }
 
 function playSound(type){
@@ -484,11 +523,11 @@ function playSound(type){
   try{
     const now=audioCtx.currentTime;
     if(type==='click'){
-      // 2. ÖTLET: Mechanikus fa/kocka kattanás hanghatás
+      // Mély öblös fa-koppanás (90-180 Hz)
       const osc=audioCtx.createOscillator(), gain=audioCtx.createGain();
-      osc.type='triangle'; osc.frequency.setValueAtTime(1400,now); osc.frequency.exponentialRampToValueAtTime(320,now+0.04);
-      gain.gain.setValueAtTime(0.4,now); gain.gain.exponentialRampToValueAtTime(0.01,now+0.04);
-      osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now+0.04);
+      osc.type='triangle'; osc.frequency.setValueAtTime(180,now); osc.frequency.exponentialRampToValueAtTime(80,now+0.05);
+      gain.gain.setValueAtTime(0.55,now); gain.gain.exponentialRampToValueAtTime(0.01,now+0.05);
+      osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now+0.05);
     } else if(type==='shot'){
       const osc=audioCtx.createOscillator(), gain=audioCtx.createGain();
       osc.type='triangle'; osc.frequency.setValueAtTime(340,now); osc.frequency.exponentialRampToValueAtTime(35,now+0.16);
@@ -505,21 +544,21 @@ function playSound(type){
       gain.gain.setValueAtTime(0.4,now); gain.gain.exponentialRampToValueAtTime(0.01,now+0.2);
       osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now+0.2);
     } else if(type==='ambush'){
-      // Feszes tam-tam indián dobritmus
+      // Mély törzsi nagydob ütemek (55-140 Hz)
       [0, 0.22, 0.44, 0.58].forEach((offset, idx)=>{
         const osc=audioCtx.createOscillator(), gain=audioCtx.createGain();
         osc.type='triangle';
-        const startFreq = idx%2===0 ? 460 : 360;
+        const startFreq = idx%2===0 ? 140 : 110;
         osc.frequency.setValueAtTime(startFreq, now+offset);
-        osc.frequency.exponentialRampToValueAtTime(120, now+offset+0.18);
-        gain.gain.setValueAtTime(0.85, now+offset);
-        gain.gain.exponentialRampToValueAtTime(0.01, now+offset+0.18);
+        osc.frequency.exponentialRampToValueAtTime(55, now+offset+0.2);
+        gain.gain.setValueAtTime(0.9, now+offset);
+        gain.gain.exponentialRampToValueAtTime(0.01, now+offset+0.2);
         osc.connect(gain); gain.connect(audioCtx.destination);
-        osc.start(now+offset); osc.stop(now+offset+0.18);
+        osc.start(now+offset); osc.stop(now+offset+0.2);
       });
       const oscA=audioCtx.createOscillator(), gainA=audioCtx.createGain();
-      oscA.type='sine'; oscA.frequency.setValueAtTime(950, now+0.7);
-      oscA.frequency.exponentialRampToValueAtTime(250, now+0.95);
+      oscA.type='sine'; oscA.frequency.setValueAtTime(750, now+0.7);
+      oscA.frequency.exponentialRampToValueAtTime(180, now+0.95);
       gainA.gain.setValueAtTime(0.5, now+0.7);
       gainA.gain.exponentialRampToValueAtTime(0.01, now+0.95);
       oscA.connect(gainA); gainA.connect(audioCtx.destination);
@@ -564,7 +603,7 @@ function toggleReorderMode(){
 
 let dragSrcIdx=null, lastSeatTapIdx=null, seatTapTimer=null;
 
-/* 2D ASZTAL FORGATÁS: MINDENKI SAJÁT MAGÁT LÁTJA LEGALUL + ZÖLD KERET */
+/* 2D ASZTAL FORGATÁS */
 function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, allowDrag=false, revealAll=false){
   const c=document.getElementById(containerId); if(!c) return;
   const nodesToRemove=c.querySelectorAll('.seat-node, .table-2d-oval');
@@ -580,11 +619,10 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
 
   const N=players.length;
 
-  // Kamera középpontja (ki legyen legalul):
   let myViewIdx = 0;
   if(isLiveGame){
     if(mode==='LOCAL'){
-      myViewIdx = activeIdx; // 1 telefonon az van alul, aki épp fogja a mobilt
+      myViewIdx = activeIdx;
     } else {
       myViewIdx = players.findIndex(p=>p.peerId===myId);
       if(myViewIdx===-1) myViewIdx=0;
@@ -592,7 +630,6 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
   }
 
   players.forEach((p,i)=>{
-    // Relatív pozíció, hogy a saját karakter mindig legalul (Math.PI/2) legyen
     const relIdx = (i - myViewIdx + N) % N;
     const angle = Math.PI/2 + (relIdx / N) * 2 * Math.PI * (dir||1);
     const left = 50 + 40 * Math.cos(angle);
@@ -601,7 +638,7 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
     const node=document.createElement('div');
     const isAct=isLiveGame && (i===activeIdx);
     const isDead=isLiveGame && !p.alive;
-    const isLowHp=isLiveGame && p.alive && p.hp<=3; // Dobogó szív 3 vagy kevesebb életernél!
+    const isLowHp=isLiveGame && p.alive && p.hp<=3;
     const isMe=(isLiveGame && ((mode==='LOCAL'&&i===activeIdx)||(mode==='ONLINE'&&p.peerId===myId)));
 
     node.className=`seat-node ${p.isHost?'host-seat':''} ${isAct?'active-turn':''} ${isDead?'dead-seat':''} ${isLowHp?'low-hp-pulse':''} ${isMe?'my-seat':''} ${allowDrag?'draggable':''}`;
@@ -655,7 +692,6 @@ function triggerMyShootingMuzzleFlash(){
   if(card){ card.classList.add('firing'); setTimeout(()=>card.classList.remove('firing'),420); }
 }
 
-/* 1. ÖTLET: CÉLKERESZT ANIMÁCIÓ */
 function triggerCrosshair(targetIdx){
   const node=document.getElementById(`seat-node-game-2d-table-${targetIdx}`);
   if(!node) return;
@@ -668,6 +704,18 @@ function triggerCrosshair(targetIdx){
   setTimeout(()=>ch.remove(),500);
 }
 
+function showFloatingEmote(playerIdx, emoji){
+  const node=document.getElementById(`seat-node-game-2d-table-${playerIdx}`);
+  if(!node) return;
+  const b=document.createElement('div');
+  b.className='floating-emote-bubble';
+  b.innerText=emoji;
+  b.style.left=node.style.left;
+  b.style.top=node.style.top;
+  getAnimLayer().appendChild(b);
+  setTimeout(()=>b.remove(),2200);
+}
+
 function triggerDamageAnim(targetIdx, amount, fromIdx=null, silent=false){
   if(!silent) playSound('shot');
   const node=document.getElementById(`seat-node-game-2d-table-${targetIdx}`);
@@ -677,11 +725,6 @@ function triggerDamageAnim(targetIdx, amount, fromIdx=null, silent=false){
     fl.className='float-indicator float-dmg'; fl.innerText=`-${amount}`;
     fl.style.left=node.style.left; fl.style.top=node.style.top;
     getAnimLayer().appendChild(fl); setTimeout(()=>fl.remove(),950);
-  } else {
-    const fl=document.createElement('div');
-    fl.className='float-indicator float-dmg'; fl.innerText=`-${amount} HP`;
-    fl.style.left='50%'; fl.style.top='40%';
-    document.body.appendChild(fl); setTimeout(()=>fl.remove(),950);
   }
   if(!silent && fromIdx!==null && fromIdx!==targetIdx) triggerBulletTracer(fromIdx,targetIdx);
   const myP=(mode==='LOCAL')?G?.players[G.act]:G?.players.find(p=>p.peerId===myId);
@@ -713,11 +756,6 @@ function triggerHealAnim(targetIdx, amount){
     fl.className='float-indicator float-heal'; fl.innerText=`+${amount}`;
     fl.style.left=node.style.left; fl.style.top=node.style.top;
     getAnimLayer().appendChild(fl); setTimeout(()=>fl.remove(),950);
-  } else {
-    const fl=document.createElement('div');
-    fl.className='float-indicator float-heal'; fl.innerText=`+${amount} HP 🍻`;
-    fl.style.left='50%'; fl.style.top='40%';
-    document.body.appendChild(fl); setTimeout(()=>fl.remove(),950);
   }
 }
 
@@ -751,7 +789,7 @@ function triggerArrowFlyAnim(targetIdx, reverse=false){
   setTimeout(()=>arr.remove(),500);
 }
 
-/* JAVÍTOTT INDIÁNTÁMADÁS: 0,4 MP / SÉRÜLT JÁTÉKOS KÖRBEJÁRVA */
+/* INDIÁNTÁMADÁS: 0,4 MP / SÉRÜLT JÁTÉKOS */
 function triggerAmbushSequence(callback){
   playSound('ambush');
   const layer=document.getElementById('ambush-layer');
@@ -785,11 +823,10 @@ function triggerAmbushSequence(callback){
     return;
   }
 
-  // Pontosan 0.4 másodperc jut minden sérült játékosra körben!
   hurtPlayers.forEach((p, idx)=>{
     setTimeout(()=>{
       const d=(p.character.n==="Jourdonnais")?Math.min(1,p.arrows):p.arrows;
-      triggerDamageAnim(p.id, d, null, true); // silent=true: nincs lövéshang!
+      triggerDamageAnim(p.id, d, null, true);
       playSound('arrow');
       p.arrows=0;
     }, introTime + idx*400);
@@ -822,11 +859,6 @@ function triggerDeathAnim(targetIdx){
     fl.className='float-indicator'; fl.innerText='💀';
     fl.style.left=node.style.left; fl.style.top=node.style.top;
     getAnimLayer().appendChild(fl); setTimeout(()=>fl.remove(),1200);
-  } else {
-    const fl=document.createElement('div');
-    fl.className='float-indicator'; fl.innerText='💀 KIESETT';
-    fl.style.left='50%'; fl.style.top='40%';
-    document.body.appendChild(fl); setTimeout(()=>fl.remove(),1200);
   }
 }
 
@@ -853,10 +885,6 @@ function triggerGatlingSweep(){
   playSound('shot');
   const oval=document.querySelector('#game-2d-table .table-2d-oval');
   if(oval){ oval.classList.add('gatling-sweep'); setTimeout(()=>oval.classList.remove('gatling-sweep'),850); }
-  else {
-    document.body.classList.add('hit-by-bullet');
-    setTimeout(()=>document.body.classList.remove('hit-by-bullet'),600);
-  }
 }
 
 function bcastAnim(animObj){
@@ -869,6 +897,7 @@ function handleRemoteAnim(a){
   else if(a.type==='ARROW') triggerArrowFlyAnim(a.target, a.rev);
   else if(a.type==='AMBUSH') triggerAmbushSequence();
   else if(a.type==='CROSSHAIR') triggerCrosshair(a.target);
+  else if(a.type==='EMOTE') showFloatingEmote(a.target, a.emoji);
   else if(a.type==='DYN') triggerDynamiteShake();
   else if(a.type==='GATLING') triggerGatlingSweep();
   else if(a.type==='DEATH') triggerDeathAnim(a.target);
@@ -1158,19 +1187,37 @@ function hostAddBot(){
   G.players.push({id:G.players.length,peerId:`bot-${Date.now()}`,name:names[G.players.length%names.length]+' Bot',isHost:false,isBot:true});
   renderLobby(); bcast();
 }
+
+/* JÁTÉKOS VISSZATÉRÉSE ÉS BOT HELYÉNEK VISSZAVÉTELE */
 function handleHostData(c,d){
   if(d.t==='JOIN'){
-    if(G.phase==='GAME'){
-      const ex=G.players.find(p=>p.name.toLowerCase()===d.n.toLowerCase());
-      if(ex){ ex.peerId=c.peer; log(`🔄 <b>${ex.name}</b> visszalépett!`,'event'); bcast(); return; }
-      return c.send({t:'ERR',m:'A játék már fut!'});
+    const normName = d.n.trim().toLowerCase();
+    const ex = G.players.find(p => p.name.trim().toLowerCase() === normName || p.name.trim().toLowerCase() === normName + ' (bot)');
+    if(ex){
+      ex.peerId = c.peer;
+      if(ex.isBot){
+        ex.isBot = false;
+        if(ex.name.endsWith(' (Bot)')) ex.name = ex.name.replace(/ \(Bot\)$/, '');
+        log(`🔄 <b>${ex.name}</b> visszatért és átvette a helyét a Bottól!`, 'event');
+      } else {
+        log(`🔄 <b>${ex.name}</b> visszalépett!`, 'event');
+      }
+      bcast();
+      return;
     }
+    if(G.phase==='GAME') return c.send({t:'ERR',m:'A játék már fut!'});
     if(G.players.length>=8) return c.send({t:'ERR',m:'Betelt a szoba!'});
     G.players.push({id:G.players.length,peerId:c.peer,name:d.n,isHost:false,isBot:false});
     renderLobby(); bcast();
   } else if(d.t==='ACT') handleAct(d.a,c.peer);
-  else if(d.t==='EM'){ toast(`${d.n}: ${d.e}`); bcastEm(d.n,d.e,c.peer); }
+  else if(d.t==='EM'){
+    toast(`${d.n}: ${d.e}`);
+    const pIdx=G.players.findIndex(p=>p.peerId===c.peer||p.name===d.n);
+    if(pIdx!==-1){ showFloatingEmote(pIdx,d.e); bcastAnim({type:'EMOTE',target:pIdx,emoji:d.e}); }
+    bcastEm(d.n,d.e,c.peer);
+  }
 }
+
 function joinRoom(){
   const n=document.getElementById('my-name-input').value.trim(); const cd=document.getElementById('join-code-input').value.trim().toUpperCase();
   if(!n||!cd) return alert('Add meg a neved és a kódot!');
@@ -1204,7 +1251,6 @@ function renderLobby(){
   const btn=document.getElementById('btn-start-online');
   if(isHost){ btn.disabled=G.players.length<3; btn.innerText=`Indítás (${G.players.length} játékos) 🎲`; }
 
-  // Nem házigazda szabály-összegzője
   if(!isHost){
     const list=document.getElementById('client-rules-list');
     list.innerHTML=`
@@ -1236,7 +1282,13 @@ function sendAct(a){
 }
 function openEmotes(){ document.getElementById('modal-em').classList.remove('hidden'); }
 function sendEm(e){
-  closeM('modal-em'); toast(`${myName}: ${e}`);
+  closeM('modal-em');
+  toast(`${myName}: ${e}`);
+  const myP = (mode==='LOCAL')?G.players[G.act]:G.players.find(p=>p.peerId===myId);
+  if(myP){
+    showFloatingEmote(myP.id, e);
+    bcastAnim({type:'EMOTE', target:myP.id, emoji:e});
+  }
   if(isHost) bcastEm(myName,e,myId);
   else if(connH&&connH.open) connH.send({t:'EM',n:myName,e});
 }
@@ -1246,38 +1298,120 @@ function toast(t){
   b.className='toast-bubble'; b.innerText=t; c.appendChild(b); setTimeout(()=>b.remove(),3000);
 }
 
-/* KIRÚGÁS */
+/* 3 OPCIÓS KIRÚGÁSI FOLYAMAT (KIZÁRÓLAG HÁZIGAZDA) */
 function openKickModal(){
   const s=document.getElementById('kick-player-select'); s.innerHTML='';
   G.players.forEach((p,idx)=>{
-    if(p.alive&&!p.isHost){
-      const opt=document.createElement('option'); opt.value=idx; opt.innerText=`${p.name} ${p.isBot?'(Bot)':''} (❤️ ${p.hp}/${p.maxHp})`;
+    if(!p.isHost && (G.phase==='LOBBY' || p.alive)){
+      const opt=document.createElement('option'); opt.value=idx;
+      opt.innerText=`${p.name} ${p.isBot?'(Bot)':''} ${G.phase==='GAME' ? '(❤️ '+p.hp+'/'+p.maxHp+')' : ''}`;
       s.appendChild(opt);
     }
   });
-  if(!s.children.length) return alert('Nincs kirúgható aktív játékos!');
+  if(!s.children.length) return alert('Nincs eltávolítható játékos!');
+  document.getElementById('kick-step-options').classList.remove('hidden');
+  document.getElementById('kick-role-decide').classList.add('hidden');
+  document.getElementById('kick-manual-roles').classList.add('hidden');
   document.getElementById('modal-kick').classList.remove('hidden');
 }
-function executeKickFlow(){
+
+function selectKickAction(actionType){
   const selIdx=parseInt(document.getElementById('kick-player-select').value);
   const target=G.players[selIdx]; if(!target) return;
-  closeM('modal-kick');
-  if(!confirm(`Biztosan ki akarod rúgni ${target.name} játékost?`)) return;
-  const opt=prompt("Hogyan távolítsuk el?\n1: Kiesik a játékból (mintha meghalt volna)\n2: Egy 🤖 Bot veszi át a helyét\n(Írd be: 1 vagy 2)","1");
-  if(opt!=="1"&&opt!=="2") return;
-  const reshuffle=confirm("Újraossza a játék a szerepeket a megmaradt játékosok között?");
-  if(opt==="1"){
-    log(`⚠️ <b>${target.name}</b> ki lett rúgva!`,'damage'); dmgP(selIdx,target.hp);
-  } else {
-    log(`🤖 <b>${target.name}</b> helyét egy Bot vette át!`,'event'); target.isBot=true; target.name+=' (Bot)';
+  pendingKickTargetIdx = selIdx;
+
+  if(actionType==='BOT'){
+    // 2. Opció: Bot veszi át a helyét
+    closeM('modal-kick');
+    target.isBot=true;
+    if(!target.name.includes('(Bot)')) target.name+=' (Bot)';
+    log(`🤖 <b>${target.name}</b> helyét egy Bot vette át!`, 'event');
+    mode==='LOCAL'?sync():bcast();
+  } else if(actionType==='DIE'){
+    // 3. Opció: Kiesés (meghal)
+    closeM('modal-kick');
+    log(`⚠️ <b>${target.name}</b> kiesett a játékból!`, 'damage');
+    dmgP(selIdx, target.hp, null, 'A Házigazda döntése alapján kiesett!');
+    if(G.act===selIdx) endTurn();
+    else mode==='LOCAL'?sync():bcast();
+  } else if(actionType==='REMOVE'){
+    // 1. Opció: Teljes eltávolítás
+    if(G.phase==='LOBBY'){
+      closeM('modal-kick');
+      G.players.splice(selIdx, 1);
+      G.players.forEach((p, idx)=>p.id=idx);
+      renderLobby(); bcast();
+      toast('Játékos teljesen eltávolítva a szobából.');
+    } else {
+      // Játék közben dönteni kell a szerepekről!
+      document.getElementById('kick-step-options').classList.add('hidden');
+      document.getElementById('kick-role-decide').classList.remove('hidden');
+    }
   }
-  if(reshuffle){
+}
+
+function finalizeKickRemoval(roleOption){
+  const selIdx=pendingKickTargetIdx;
+  const target=G.players[selIdx]; if(!target) return;
+  closeM('modal-kick');
+
+  log(`🚫 <b>${target.name}</b> teljesen el lett távolítva a játékból!`, 'damage');
+  G.players.splice(selIdx, 1);
+  G.players.forEach((p, idx)=>p.id=idx);
+
+  if(roleOption==='RESHUFFLE'){
     const living=G.players.filter(p=>p.alive), newRoles=getRoles(living.length);
     living.forEach((p,i)=>{ p.role=newRoles[i]; if(p.role==='Seriff'&&p.hp<10) p.hp+=2; });
-    log(`🎲 A szerepek újra lettek osztva!`,'event');
+    log(`🎲 A szerepek automatikusan újra lettek osztva!`, 'event');
   }
-  if(G.act===selIdx&&opt==="1") endTurn();
-  else mode==='LOCAL'?sync():bcast();
+
+  if(G.act>=G.players.length) G.act=0;
+  if(checkEnd()) return;
+  mode==='LOCAL'?sync():bcast();
+}
+
+function showManualRoleAssign(){
+  document.getElementById('kick-role-decide').classList.add('hidden');
+  const box=document.getElementById('manual-role-list'); box.innerHTML='';
+  G.players.forEach((p, idx)=>{
+    if(idx!==pendingKickTargetIdx && p.alive){
+      const row=document.createElement('div');
+      row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center';
+      row.innerHTML=`
+        <span style="font-size:0.75rem;">${p.name}:</span>
+        <select class="manual-role-select" data-pidx="${idx}" style="width:110px;margin-bottom:0;padding:3px;font-size:0.72rem;">
+          <option value="Seriff" ${p.role==='Seriff'?'selected':''}>⭐ Seriff</option>
+          <option value="Bandita" ${p.role==='Bandita'?'selected':''}>🔫 Bandita</option>
+          <option value="Helyettes" ${p.role==='Helyettes'?'selected':''}>🛡️ Helyettes</option>
+          <option value="Renegát" ${p.role==='Renegát'?'selected':''}>🤠 Renegát</option>
+        </select>
+      `;
+      box.appendChild(row);
+    }
+  });
+  document.getElementById('kick-manual-roles').classList.remove('hidden');
+}
+
+function applyManualRoleAssignments(){
+  const selIdx=pendingKickTargetIdx;
+  const target=G.players[selIdx];
+  closeM('modal-kick');
+
+  document.querySelectorAll('.manual-role-select').forEach(el=>{
+    const pidx=parseInt(el.dataset.pidx);
+    if(G.players[pidx]){
+      G.players[pidx].role = el.value;
+      if(el.value==='Seriff' && G.players[pidx].hp<10) G.players[pidx].hp+=2;
+    }
+  });
+
+  log(`🚫 <b>${target.name}</b> eltávolítva, a Házigazda kézileg beállította a szerepeket!`, 'event');
+  G.players.splice(selIdx, 1);
+  G.players.forEach((p, idx)=>p.id=idx);
+
+  if(G.act>=G.players.length) G.act=0;
+  if(checkEnd()) return;
+  mode==='LOCAL'?sync():bcast();
 }
 
 /* JÁTÉK ÉS KOCKA LOGIKA */
@@ -1421,7 +1555,6 @@ function doResolveClick(){ sendAct({t:'RESOLVE'}); }
 let lastDieTapIdx=null, dieTapTimer=null;
 function onDieClick(idx){
   initAudio(); if(G.isInit) return;
-  // 2. ÖTLET: Kocka kattanás hanghatás
   playSound('click');
   if(lastDieTapIdx===idx){
     clearTimeout(dieTapTimer); lastDieTapIdx=null; sendAct({t:'QUICK_REROLL',i:idx});
@@ -1457,9 +1590,13 @@ function cancelResolve(){
   mode==='LOCAL'?sync():bcast(); toast('↩️ Visszatértél a dobáshoz!');
 }
 
-/* JAVÍTOTT KOCKADOBÁS ÉS FOLYTATÁS */
+/* KOCKADOBÁS HAPTIKUS REZGÉSSEL */
 function doRoll(){
   const cp=G.players[G.act]; if(!cp||!cp.alive){ endTurn(); return; }
+  
+  // Haptikus rezgés
+  if(navigator.vibrate) try{ navigator.vibrate(40); }catch(e){}
+
   document.querySelectorAll('.die').forEach(d=>d.classList.add('rolling'));
   setTimeout(()=>document.querySelectorAll('.die').forEach(d=>d.classList.remove('rolling')),360);
 
@@ -1521,7 +1658,7 @@ function processArrowsStepByStep(count, callback){
           p.arrows=0;
         }
       });
-      log(`🏹 <b>Indiántámadás lezajlott!</b> ${desc.join(', ')}`,'damage');
+      log(`🏹 <b>Indiántámadás!</b> ${desc.join(', ')}`,'damage');
       G.pool=9;
       if(checkEnd('🏹 Az Indiántámadás végzett a Seriffel!')) return;
 
@@ -1792,7 +1929,6 @@ function botAction(tId){
     else if(cp.role==='Seriff') ch=tgts[Math.floor(Math.random()*tgts.length)];
     const useDbl=(cp.character.n==="Slab the Killer"&&!G.slabUsedBeer&&G.pending.beer>0&&(ch.role==='Seriff'||ch.hp<=2));
     
-    // Bot lövésénél is felvillan a célkereszt
     triggerCrosshair(ch.id);
     bcastAnim({type:'CROSSHAIR', target:ch.id});
     applyTarget(ch.id,useDbl);
@@ -1803,7 +1939,7 @@ function botAction(tId){
   }
 }
 
-/* ROSE DOOLAN ÉS TÁVOLSÁGOK KISZÁMÍTÁSA */
+/* ROSE DOOLAN ÉS TÁVOLSÁGOK */
 function getTargets(dist){
   const circle=G.players.filter(p=>p.alive), cLen=circle.length;
   if(cLen<=1) return [];
@@ -1922,7 +2058,7 @@ function openHistory(ch=null){
   document.getElementById('modal-hist').classList.remove('hidden');
 }
 
-/* SYNC ÉS UI (STATUS BAR TÖRÖLVE, HELYETTE FEJLÉC SZOBAJELVÉNY) */
+/* SYNC ÉS UI */
 function sync(){
   if(!G) return;
   if(G.phase==='LOBBY'){
@@ -1960,7 +2096,6 @@ function sync(){
   document.getElementById('btn-kick').classList.toggle('hidden',!canAdmin);
   document.getElementById('btn-reorder').classList.toggle('hidden',!canAdmin);
 
-  // Szobakód kitűző a fejlécben
   const hdrRoom=document.getElementById('hdr-room');
   if(mode==='LOCAL'){
     hdrRoom.innerText='📱 Offline';
@@ -1982,7 +2117,6 @@ function sync(){
 
   const cp=G.players[G.act], isMe=(cp.peerId===myId&&!cp.isBot);
 
-  // 2 Dinamit figyelmeztetés szinkronban mindenkinek
   const dynCount=(G.dice&&G.dice.filter(d=>d.face&&d.face.id==='dynamite').length)||0;
   const oldBadge=document.getElementById('dyn-warn-badge');
   if(dynCount===2){
