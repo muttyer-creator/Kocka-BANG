@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>BANG! Kockajáték v2.8</title>
+<title>BANG! Kockajáték v2.9</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
 :root{--bg:#1a120b;--c:#2c1d11;--cl:#422c1b;--g:#f5c531;--t:#f7ede2;--a:#b22222;--b:#6d4c2d;--dmg:#c62828;--heal:#2e7d32;--host:#00d4ff;}
@@ -55,7 +55,6 @@ button.small-btn{padding:3px 6px;font-size:0.72rem;border-radius:5px;}
 .table-2d-oval{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:115px;height:82px;background:#26160c;border:3px solid var(--b);border-radius:45px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 10px rgba(0,0,0,.8);z-index:1;transition:.3s;}
 .seat-node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;padding:2px 5px;border-radius:6px;background:#1c130b;border:1px solid var(--b);font-size:0.65rem;white-space:nowrap;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,.6);touch-action:none;cursor:pointer;transition:transform .15s;}
 .seat-node.draggable{cursor:grab;}
-.seat-node.host-seat{border-color:var(--host);color:var(--host);}
 .seat-node.active-turn{border-color:var(--g);box-shadow:0 0 8px var(--g);background:#2f1f0e;}
 .seat-node.dead-seat{opacity:.35;border-color:#555;filter:grayscale(1);}
 .seat-node.drag-over{border-color:#fff;background:#44301a;transform:translate(-50%,-50%) scale(1.15);}
@@ -107,6 +106,7 @@ body.dyn-danger-warning{animation:dynWarningFlicker 0.75s infinite alternate eas
 .history-entry.damage{border-left-color:var(--dmg);}
 .history-entry.heal{border-left-color:var(--heal);}
 .history-entry.event{border-left-color:var(--g);}
+.history-entry.round{background:#2a1b10;border-left-color:var(--g);text-align:center;font-weight:bold;color:var(--g);padding:4px;}
 
 @keyframes diceRollAnim{0%{transform:rotate(0)}25%{transform:rotate(12deg) scale(1.08)}50%{transform:rotate(-12deg) scale(.95)}75%{transform:rotate(8deg) scale(1.05)}100%{transform:rotate(0)}}
 .die.rolling{animation:diceRollAnim .35s ease-in-out;}
@@ -164,7 +164,7 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
   <div style="display:flex;align-items:center;gap:4px;">
     <button id="btn-kick" class="danger small-btn hidden" onclick="openKickModal()">⚠️ Kirúgás</button>
     <button id="btn-reorder" class="secondary small-btn hidden" onclick="toggleReorderMode()">🪑 Átrendezés</button>
-    <h1>🤠 BANG! <span style="font-size:0.62rem;color:#00ff66;background:#052405;padding:1px 5px;border-radius:4px;border:1px solid #00aa44;">v2.8</span></h1>
+    <h1>🤠 BANG! <span style="font-size:0.62rem;color:#00ff66;background:#052405;padding:1px 5px;border-radius:4px;border:1px solid #00aa44;">v2.9</span></h1>
   </div>
   <div style="display:flex;align-items:center;gap:4px;">
     <span id="hdr-room-badge" style="background:#22150c;border:1px solid var(--b);color:var(--g);font-size:0.72rem;font-weight:bold;padding:2px 6px;border-radius:5px;">Szoba: <b id="hdr-room">----</b></span>
@@ -176,7 +176,6 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
   </div>
 </header>
 
-<!-- 1. FŐMENÜ -->
 <div id="view-menu" class="screen">
   <div class="box">
     <h2>HOGYAN JÁTSZOTOK?</h2>
@@ -195,7 +194,6 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
   </div>
 </div>
 
-<!-- 2A. OFFLINE BEÁLLÍTÁS -->
 <div id="view-local-setup" class="screen hidden">
   <div class="box">
     <h2>1 TELEFONOS BEÁLLÍTÁS</h2>
@@ -237,7 +235,6 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
   </div>
 </div>
 
-<!-- 2B. ONLINE MENÜ -->
 <div id="view-online-menu" class="screen hidden">
   <div class="box">
     <h2>ONLINE JÁTÉK</h2>
@@ -250,7 +247,6 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
   </div>
 </div>
 
-<!-- 3. LOBBY -->
 <div id="view-lobby" class="screen hidden">
   <div class="box">
     <h2>VÁRÓTEREM</h2>
@@ -300,7 +296,6 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
   </div>
 </div>
 
-<!-- 4. PASS KÉPERNYŐ -->
 <div id="view-pass" class="screen hidden">
   <div class="box" style="text-align:center;padding:18px;">
     <div style="font-size:2.6rem;">🤠</div>
@@ -310,7 +305,6 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
   </div>
 </div>
 
-<!-- 5. JÁTÉKTÉR -->
 <div id="view-game" class="screen hidden">
   <div class="game-container">
     <div class="live-ticker" id="live-ticker" onclick="openHistory()" title="Kattints az eseménynaplóhoz">
@@ -334,7 +328,6 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
     <div class="table-2d-wrap" id="game-2d-table"><div class="anim-layer" id="anim-layer"></div></div>
     <div class="turn-banner" id="turn-banner">...</div>
     <div id="act-panel" class="actions-box hidden">
-      <!-- KOCKATARTALÉK ÖSSZEGZŐ -->
       <div id="act-summary-bar" class="act-summary-bar"></div>
       <div id="act-msg" style="font-weight:bold;margin-bottom:3px;"></div>
       <div id="targets-box" class="targets-grid"></div>
@@ -353,7 +346,6 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
   </div>
 </div>
 
-<!-- 6. GYŐZELEM -->
 <div id="view-win" class="screen hidden">
   <div class="box" style="text-align:center;">
     <div style="font-size:2.6rem;">🏆</div>
@@ -371,7 +363,6 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
   </div>
 </div>
 
-<!-- MODÁLOK -->
 <div id="modal-char" class="modal-overlay hidden">
   <div class="modal-box">
     <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--b);padding-bottom:6px;margin-bottom:8px;">
@@ -427,8 +418,12 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
 
 <div id="modal-hist" class="modal-overlay hidden">
   <div class="modal-box">
-    <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--b);padding-bottom:6px;margin-bottom:8px;">
+    <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--b);padding-bottom:4px;margin-bottom:6px;">
       <h3 style="color:var(--g);">📜 Eseménynapló</h3><button class="secondary small-btn" onclick="closeM('modal-hist')">✕</button>
+    </div>
+    <div style="display:flex;gap:4px;margin-bottom:6px;">
+      <button id="btn-hist-all" class="small-btn w-100" style="background:var(--g);color:#000;" onclick="renderHistFiltered('all')">📜 Összes</button>
+      <button id="btn-hist-combat" class="secondary small-btn w-100" onclick="renderHistFiltered('combat')">⚔️ Csak Harc & Halál</button>
     </div>
     <div class="history-list" id="hist-list"></div>
   </div>
@@ -486,6 +481,7 @@ let isReorderActive=false, currentTurnId=0, botTimer=null;
 let audioCtx=null, isMuted=false, isVibrateEnabled=true;
 let isAmbushLock=false;
 let pendingKickTargetIdx=null;
+let currentHistFilter='all';
 
 const peerConfig = {
   config: {
@@ -523,6 +519,7 @@ function triggerVib(pattern){
   if(navigator.vibrate) try{ navigator.vibrate(pattern); }catch(e){}
 }
 
+/* PRÉMIUM AKUSZTIKUS HANGOK */
 function playSound(type){
   if(isMuted||!audioCtx) return;
   try{
@@ -532,6 +529,16 @@ function playSound(type){
       osc.type='triangle'; osc.frequency.setValueAtTime(140,now); osc.frequency.exponentialRampToValueAtTime(50,now+0.05);
       gain.gain.setValueAtTime(0.5,now); gain.gain.exponentialRampToValueAtTime(0.01,now+0.05);
       osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now+0.05);
+    } else if(type==='turn'){
+      // Western zsebóra-harangjáték
+      [880, 1320].forEach((freq, idx)=>{
+        const osc=audioCtx.createOscillator(), gain=audioCtx.createGain();
+        osc.type='sine'; osc.frequency.setValueAtTime(freq, now+idx*0.12);
+        gain.gain.setValueAtTime(0.35, now+idx*0.12);
+        gain.gain.exponentialRampToValueAtTime(0.001, now+idx*0.12+0.6);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(now+idx*0.12); osc.stop(now+idx*0.12+0.6);
+      });
     } else if(type==='shot'){
       const bufferSize=audioCtx.sampleRate*0.18;
       const buffer=audioCtx.createBuffer(1,bufferSize,audioCtx.sampleRate);
@@ -630,6 +637,7 @@ function toggleReorderMode(){
 
 let dragSrcIdx=null, lastSeatTapIdx=null, seatTapTimer=null;
 
+/* 2D ASZTAL: HÁZIGAZDÁNÁL NINCS KORONA ÉS KÉK SZÍN */
 function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, allowDrag=false, revealAll=false){
   const c=document.getElementById(containerId); if(!c) return;
   const nodesToRemove=c.querySelectorAll('.seat-node, .table-2d-oval');
@@ -670,13 +678,12 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
     const isMe=(isLiveGame && ((mode==='LOCAL'&&i===activeIdx)||(mode==='ONLINE'&&p.peerId===myId)));
     const isDynDangerSeat = isAct && activeHas2Dyn;
 
-    node.className=`seat-node ${p.isHost?'host-seat':''} ${isAct?'active-turn':''} ${isDead?'dead-seat':''} ${isLowHp?'low-hp-pulse':''} ${isMe?'my-seat':''} ${isDynDangerSeat?'dyn-danger-node':''} ${allowDrag?'draggable':''}`;
+    node.className=`seat-node ${isAct?'active-turn':''} ${isDead?'dead-seat':''} ${isLowHp?'low-hp-pulse':''} ${isMe?'my-seat':''} ${isDynDangerSeat?'dyn-danger-node':''} ${allowDrag?'draggable':''}`;
     node.id=`seat-node-${containerId}-${i}`;
     node.style.left=left+'%'; node.style.top=top+'%';
     node.dataset.idx=i;
 
     const shStar=(isLiveGame && p.role==='Seriff')?'⭐ ':'';
-    const hostCrown=p.isHost?'👑 ':'';
     const botIcon=p.isBot?'🤖 ':'';
     const meTag=isMe?'<span class="my-seat-tag">(Én)</span>':'';
     let stats='';
@@ -691,7 +698,7 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
     } else {
       stats=`<span style="color:#aaa;">${i+1}. Hely</span>`;
     }
-    node.innerHTML=`<b>${hostCrown}${shStar}${p.name||p.n}${meTag}</b>${botIcon}${stats}`;
+    node.innerHTML=`<b>${shStar}${p.name||p.n}${meTag}</b>${botIcon}${stats}`;
 
     node.onclick=()=>{ if(!allowDrag) onSeatNodeClick(i); };
 
@@ -869,14 +876,13 @@ function triggerAmbushSequence(callback){
     return;
   }
 
-  // 0.4 mp-enként egyesével levonjuk és animáljuk
   ambushDamages.forEach((item, k)=>{
     setTimeout(()=>{
       const targetP = G.players[item.idx];
       targetP.hp = Math.max(0, targetP.hp - item.d);
       targetP.arrows = 0;
       
-      triggerDamageAnim(item.idx, item.d, null, true); // silent: nincs fegyverhang!
+      triggerDamageAnim(item.idx, item.d, null, true);
       playSound('arrow');
       triggerVib([70, 40, 70]);
       log(`🏹 <b>${targetP.name}</b> elveszített ${item.d} HP-t az indiánoktól! (${targetP.hp}/${targetP.maxHp})`, 'damage');
@@ -885,7 +891,7 @@ function triggerAmbushSequence(callback){
         targetP.alive = false;
         triggerDeathAnim(item.idx);
         bcastAnim({type:'DEATH', target:item.idx});
-        log(`☠️ <b>${targetP.name} elesett</b> az indiántámadásban!`, 'event');
+        log(`☠️ <b>${targetP.name} elesett</b> az indiántámadásban!`, 'damage');
       }
 
       mode==='LOCAL' ? sync() : bcast();
@@ -1003,7 +1009,6 @@ function handleDoubleTapTarget(targetIdx){
     return;
   }
 
-  // Önlövés kizárva
   if(G.actType.startsWith('shoot')&&(target.id===cp.id||target.peerId===cp.peerId||target.name===cp.name||target===cp)){
     toast('❌ Nem lőhetsz magadba!'); return;
   }
@@ -1120,7 +1125,7 @@ function renderLocalCfgList(){
   const box=document.getElementById('local-cfg-list'); box.innerHTML='';
   localCfg.forEach((p,i)=>{
     const card=document.createElement('div'); card.className='cfg-card';
-    card.innerHTML=`<div class="cfg-badge">${p.isHost?'👑':''}${i+1}.</div>
+    card.innerHTML=`<div class="cfg-badge">${i+1}.</div>
     <input type="text" class="cfg-input" value="${p.n}" oninput="updateLocalName(${i},this.value)" placeholder="Név...">
     <button type="button" class="cfg-type-btn ${p.bot?'cfg-type-bot':'cfg-type-human'}" onclick="toggleLocalBot(${i})">${p.bot?'🤖 Bot':'👤 Ember'}</button>
     <div style="display:flex;gap:2px;"><button type="button" class="arrow-btn" onclick="moveLocal(${i},-1)">▲</button><button type="button" class="arrow-btn" onclick="moveLocal(${i},1)">▼</button></div>`;
@@ -1526,7 +1531,15 @@ function initTurn(){
   G.maxBudget=cp.character.n==="Lucky Duke"?4:3; G.budget=G.maxBudget;
   G.gringoHit=false; G.gatlingFired=false; G.gatlingDeclinedThisTurn=false; G.slabUsedBeer=false; G.isResolving=false;
   G.dice=Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0}));
-  G.pending={s1:0,s2:0,beer:0,kitArrows:0}; G.actType=null;
+  G.pending={s1:0,s2:0,beer:0,kitArrows:0}; G.actType=null; G.pendingBart=null;
+
+  log(`--- 🤠 <b>${cp.name}</b> köre kezdődik ---`, 'round');
+
+  const isMe=(mode==='LOCAL')||(cp.peerId===myId&&!cp.isBot);
+  if(isMe){
+    playSound('turn');
+    triggerVib([90]);
+  }
 
   if(cp.character.n==="Sid Ketchum"){
     const anyoneHurt=G.players.some(p=>p.alive&&p.hp<p.maxHp);
@@ -1571,8 +1584,11 @@ function proceedLocalTurn(){
   initAudio(); document.getElementById('view-pass').classList.add('hidden'); myId=G.players[G.act].peerId; sync();
 }
 
+/* JAVÍTOTT HANDLEACT: BART CASSIDY DÖNTÉSE MINDIG ÁTMEGY! */
 function handleAct(a,sp){
-  if(isAmbushLock||G.phase!=='GAME'||G.players[G.act].peerId!==sp) return;
+  const isBartActor = a.t === 'BART_CHOICE' && G.pendingBart && G.players[G.pendingBart.tIdx]?.peerId === sp;
+  if(isAmbushLock || G.phase !== 'GAME' || (G.players[G.act].peerId !== sp && !isBartActor)) return;
+
   if(a.t==='SID_CHOICE') applySidChoice(a.id);
   else if(a.t==='SKIP_SID') skipSidChoice();
   else if(a.t==='ROLL') doRoll();
@@ -1821,7 +1837,6 @@ function fireGatling(){
   }
 }
 
-/* JAVÍTOTT DMGP EL GRINGO AZONNALI NYILÁVAL */
 function dmgP(idx,d,att=null,causeOverride='',silent=false){
   const p=G.players[idx]; p.hp=Math.max(0,p.hp-d);
   triggerDamageAnim(idx,d,att,silent);
@@ -1829,7 +1844,6 @@ function dmgP(idx,d,att=null,causeOverride='',silent=false){
   
   if(p.character.n==="Pedro Ramirez"&&p.arrows>0){ p.arrows--; G.pool++; log(`🪶 <b>${p.name}</b> eldobott 1 nyilat!`,'event'); }
   
-  // EL GRINGO: Bárki megsebzi, a támadója azonnal kap 1 nyilat!
   if(p.character.n==="El Gringo" && att!==null && att!==idx){
     log(`🌵 <b>${p.name}</b> képessége: a támadó (<b>${G.players[att].name}</b>) kapott 1 nyilat!`, 'damage');
     takeArrow(att);
@@ -1839,11 +1853,11 @@ function dmgP(idx,d,att=null,causeOverride='',silent=false){
     p.alive=false; G.pool+=p.arrows; p.arrows=0;
     triggerDeathAnim(idx); bcastAnim({type:'DEATH',target:idx});
     const roleTxt=(!G.hideDead||p.role==='Seriff')?` (${p.role})`:'';
-    log(`☠️ <b>${p.name} kiesett!</b>${roleTxt}`,'event');
+    log(`☠️ <b>${p.name} kiesett!</b>${roleTxt}`,'damage');
     if(p.role==='Seriff'&&causeOverride) G.lastFatalCause=causeOverride;
     G.players.forEach((s,si)=>{
       if(s.alive&&s.character.n==="Vulture Sam"&&si!==idx){
-        s.hp=Math.min(s.maxHp,s.hp+2); log(`🦅 <b>Vulture Sam</b> +2 HP-t kapott!`,'event');
+        s.hp=Math.min(s.maxHp,s.hp+2); log(`🦅 <b>Vulture Sam</b> +2 HP-t kapott!`,'heal');
         triggerHealAnim(si,2); bcastAnim({type:'HEAL',target:si,amount:2});
       }
     });
@@ -1904,7 +1918,7 @@ function resolveStep(){
   }
 }
 
-/* JAVÍTOTT LÖVÉS ÉS BART CASSIDY INTERAKTÍV DÖNTÉSSEL */
+/* BART CASSIDY DÖNTÉSE ÉS LÖVÉSSZÁMLÁLÓ CSÖKKENTÉSE */
 function applyTarget(tIdx, isDbl=false){
   const cp=G.players[G.act]; if(!cp||!cp.alive){ endTurn(); return; }
   const a=cp.name, t=G.players[tIdx].name;
@@ -1915,29 +1929,31 @@ function applyTarget(tIdx, isDbl=false){
     log(`💥 <b>${a}</b> feláldozott 1 Sört a dupla sebzésért (2 HP)!`,'damage');
   }
 
+  const currentShotType = G.actType;
   const targetP=G.players[tIdx];
-  if(targetP.character.n==="Bart Cassidy"&&G.pool>=dmgAmount&&G.actType.startsWith('shoot')){
+
+  if(targetP.character.n==="Bart Cassidy"&&G.pool>=dmgAmount&&currentShotType.startsWith('shoot')){
     if(targetP.isBot){
       if(targetP.hp<=3&&G.pool>dmgAmount){
         targetP.arrows+=dmgAmount; G.pool-=dmgAmount;
         log(`🏹 <b>Bart Cassidy (Bot)</b> felvett ${dmgAmount} nyilat életvesztés helyett!`,'event');
         triggerArrowFlyAnim(tIdx); bcastAnim({type:'ARROW',target:tIdx,rev:false});
       } else dealShootDamage(tIdx,dmgAmount,a,t);
-      finalizeShotAction();
+      finalizeShotAction(currentShotType);
     } else {
-      G.pendingBart={tIdx,dmgAmount,attackerName:a,targetName:t};
+      G.pendingBart={tIdx, dmgAmount, attackerName:a, targetName:t, shotType:currentShotType};
       G.actType='bartChoice'; mode==='LOCAL'?sync():bcast();
     }
     return;
   }
   dealShootDamage(tIdx,dmgAmount,a,t);
-  finalizeShotAction();
+  finalizeShotAction(currentShotType);
 }
 
 function dealShootDamage(tIdx, dmgAmount, a, t){
   triggerVib(90);
-  if(G.actType==='shoot1'){ log(`🎯1 <b>${a}</b> ➔ <b>${t}</b> (-${dmgAmount} HP)`,'damage'); dmgP(tIdx,dmgAmount,G.act,`🎯1 ${a} lövése végzett a Seriffel!`,false); }
-  else if(G.actType==='shoot2'){ log(`🎯2 <b>${a}</b> ➔ <b>${t}</b> (-${dmgAmount} HP)`,'damage'); dmgP(tIdx,dmgAmount,G.act,`🎯2 ${a} távoli lövése végzett a Seriffel!`,false); }
+  if(G.actType==='shoot1'||G.pendingBart?.shotType==='shoot1'){ log(`🎯1 <b>${a}</b> ➔ <b>${t}</b> (-${dmgAmount} HP)`,'damage'); dmgP(tIdx,dmgAmount,G.act,`🎯1 ${a} lövése végzett a Seriffel!`,false); }
+  else if(G.actType==='shoot2'||G.pendingBart?.shotType==='shoot2'){ log(`🎯2 <b>${a}</b> ➔ <b>${t}</b> (-${dmgAmount} HP)`,'damage'); dmgP(tIdx,dmgAmount,G.act,`🎯2 ${a} távoli lövése végzett a Seriffel!`,false); }
   else if(G.actType==='beer'){
     const isJesse=(G.players[tIdx].character.n==="Jesse Jones"&&G.players[tIdx].hp<=4&&tIdx===G.act);
     const h=isJesse?2:1;
@@ -1947,23 +1963,28 @@ function dealShootDamage(tIdx, dmgAmount, a, t){
   }
 }
 
-function finalizeShotAction(){
-  if(G.actType==='shoot1') G.pending.s1--; else if(G.actType==='shoot2') G.pending.s2--;
+function finalizeShotAction(explicitShotType = null){
+  const sType = explicitShotType || G.actType;
+  if(sType==='shoot1') G.pending.s1 = Math.max(0, G.pending.s1 - 1);
+  else if(sType==='shoot2') G.pending.s2 = Math.max(0, G.pending.s2 - 1);
+  
   if(checkEnd()) return;
-  const cp=G.players[G.act]; if(!cp.alive){ endTurn(); return; }
+  const cp=G.players[G.act]; if(!cp.alive){ G.actType=null; endTurn(); return; }
   resolveStep();
 }
 
 function applyBartChoice(takeArrowChoice){
   if(!G.pendingBart) return;
-  const {tIdx,dmgAmount,attackerName,targetName}=G.pendingBart;
+  const {tIdx,dmgAmount,attackerName,targetName,shotType}=G.pendingBart;
   const targetP=G.players[tIdx];
   if(takeArrowChoice&&G.pool>=dmgAmount){
     targetP.arrows+=dmgAmount; G.pool-=dmgAmount;
     log(`🏹 <b>Bart Cassidy</b> felvett ${dmgAmount} nyilat életvesztés helyett!`,'event');
     triggerArrowFlyAnim(tIdx); bcastAnim({type:'ARROW',target:tIdx,rev:false});
   } else dealShootDamage(tIdx,dmgAmount,attackerName,targetName);
-  G.pendingBart=null; finalizeShotAction();
+  
+  G.pendingBart=null;
+  finalizeShotAction(shotType);
 }
 
 function applyKitArrowTarget(tIdx){
@@ -2127,11 +2148,42 @@ function openArchive(){
   document.getElementById('modal-arc').classList.remove('hidden');
 }
 function clearArc(){ if(confirm('Törlöd?')){ localStorage.removeItem('bang_a'); openArchive(); } }
+
+/* SZŰRHETŐ ESEMÉNYNAPLÓ */
 function openHistory(ch=null){
-  const l=document.getElementById('hist-list'); l.innerHTML=''; const h=ch||(G?G.hist:[]);
-  if(!h.length) l.innerHTML='<div style="color:#aaa;text-align:center;padding:15px;">Nincs napló.</div>';
-  else h.forEach(x=>{ const el=document.createElement('div'); el.className=`history-entry ${x.type}`; el.innerHTML=`<div style="font-size:0.7rem;color:#888;">${x.time}</div><div>${x.txt}</div>`; l.appendChild(el); });
+  window.currentHistSource = ch;
+  renderHistFiltered(currentHistFilter);
   document.getElementById('modal-hist').classList.remove('hidden');
+}
+
+function renderHistFiltered(filterType){
+  currentHistFilter = filterType;
+  const l=document.getElementById('hist-list'); l.innerHTML='';
+  const h=window.currentHistSource || (G?G.hist:[]);
+
+  const bAll = document.getElementById('btn-hist-all');
+  const bCombat = document.getElementById('btn-hist-combat');
+  if(bAll && bCombat){
+    bAll.style.background = (filterType==='all') ? 'var(--g)' : 'var(--cl)';
+    bAll.style.color = (filterType==='all') ? '#000' : 'var(--t)';
+    bCombat.style.background = (filterType==='combat') ? 'var(--g)' : 'var(--cl)';
+    bCombat.style.color = (filterType==='combat') ? '#000' : 'var(--t)';
+  }
+
+  if(!h.length){
+    l.innerHTML='<div style="color:#aaa;text-align:center;padding:15px;">Nincs napló.</div>';
+    return;
+  }
+
+  h.forEach(x=>{
+    if(filterType==='combat' && x.type!=='damage' && !x.txt.includes('kiesett') && !x.txt.includes('felrobbant') && !x.txt.includes('lelőtt')){
+      return;
+    }
+    const el=document.createElement('div');
+    el.className=`history-entry ${x.type}`;
+    el.innerHTML=`<div style="font-size:0.65rem;color:#888;">${x.time}</div><div>${x.txt}</div>`;
+    l.appendChild(el);
+  });
 }
 
 /* SYNC ÉS UI */
@@ -2279,7 +2331,6 @@ function renderActPanel(isMe){
   const sumBar=document.getElementById('act-summary-bar');
   b.innerHTML='';
   
-  // KOCKATARTALÉK ÖSSZEGZŐ SÁV
   if(G.isResolving && isMe){
     sumBar.classList.remove('hidden');
     sumBar.innerHTML=`<span>🎯1: ${G.pending.s1}</span><span>🎯2: ${G.pending.s2}</span><span>🍺 Sör: ${G.pending.beer}</span>${G.pending.kitArrows>0?`<span>🪶 Kit: ${G.pending.kitArrows}</span>`:''}`;
@@ -2320,7 +2371,6 @@ function renderActPanel(isMe){
     return;
   }
 
-  // BART CASSIDY DÖNTÉSI PANEL
   if(G.actType==='bartChoice'){
     const myP=(mode==='LOCAL')?G.players[G.pendingBart.tIdx]:G.players.find(x=>x.peerId===myId);
     if(myP&&myP.id===G.pendingBart.tIdx){
@@ -2384,7 +2434,6 @@ function renderActPanel(isMe){
     
     getTargets(d).forEach(t=>{
       const shTag=(t.role==='Seriff')?'⭐ ':'';
-      // Normál 1 sebzés
       const btn=document.createElement('button'); btn.className='danger';
       btn.innerText=`${shTag}${t.name} (1 DMG: ${t.hp}/${t.maxHp})`;
       btn.onclick=()=>{
@@ -2395,7 +2444,6 @@ function renderActPanel(isMe){
       };
       b.appendChild(btn);
 
-      // Slab the Killer külön választható dupla sebzés gombja
       if(canSlabDouble){
         const btnDbl=document.createElement('button');
         btnDbl.style.background='#ff6f00'; btnDbl.style.color='#fff';
