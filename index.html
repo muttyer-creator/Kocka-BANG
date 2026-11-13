@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>BANG! Kockajáték v2.9</title>
+<title>BANG! Kockajáték v3.0</title>
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
 :root{--bg:#1a120b;--c:#2c1d11;--cl:#422c1b;--g:#f5c531;--t:#f7ede2;--a:#b22222;--b:#6d4c2d;--dmg:#c62828;--heal:#2e7d32;--host:#00d4ff;}
@@ -20,10 +20,8 @@ header h1{color:var(--g);font-size:0.95rem;display:flex;align-items:center;gap:4
 h2{color:var(--g);margin-bottom:8px;text-align:center;font-size:1.1rem;}
 input[type="text"],select{width:100%;padding:7px;background:#120c08;border:1px solid var(--b);color:#fff;border-radius:6px;font-size:0.85rem;margin-bottom:6px;}
 button{background:var(--g);color:#000;border:none;padding:7px 11px;border-radius:8px;font-weight:bold;font-size:0.82rem;cursor:pointer;transition:.15s;}
-button:active{opacity:.8;}
-button:disabled{opacity:.4;cursor:not-allowed;}
-button.danger{background:var(--a);color:#fff;}
-button.secondary{background:var(--cl);color:var(--t);border:1px solid var(--b);}
+button:active{opacity:.8;} button:disabled{opacity:.4;cursor:not-allowed;}
+button.danger{background:var(--a);color:#fff;} button.secondary{background:var(--cl);color:var(--t);border:1px solid var(--b);}
 button.small-btn{padding:3px 6px;font-size:0.72rem;border-radius:5px;}
 .w-100{width:100%;}
 .mode-btn{display:flex;align-items:center;gap:8px;padding:9px;margin-bottom:6px;border-radius:8px;background:var(--cl);border:2px solid var(--b);color:var(--t);cursor:pointer;}
@@ -32,7 +30,6 @@ button.small-btn{padding:3px 6px;font-size:0.72rem;border-radius:5px;}
 .qr-box img{width:110px;height:110px;display:block;}
 .switch-row{display:flex;align-items:center;justify-content:space-between;background:#140d07;padding:5px 7px;border-radius:6px;border:1px solid var(--b);margin-bottom:5px;font-size:0.7rem;}
 .switch-row input{transform:scale(1.15);accent-color:var(--g);}
-
 .game-container{width:100%;max-width:460px;height:100%;display:flex;flex-direction:column;justify-content:space-between;gap:4px;}
 .live-ticker{background:#140c06;border:1px solid var(--b);border-radius:8px;padding:4px 8px;display:flex;flex-direction:column;gap:2px;font-size:0.72rem;cursor:pointer;height:160px;min-height:160px;max-height:160px;overflow:hidden;box-sizing:border-box;flex-shrink:0;}
 .ticker-row{display:flex;align-items:center;gap:5px;line-height:1.2;height:17px;}
@@ -40,16 +37,13 @@ button.small-btn{padding:3px 6px;font-size:0.72rem;border-radius:5px;}
 .ticker-latest{background:var(--g);color:#000;box-shadow:0 0 4px var(--g);}
 .ticker-old{background:#25170d;color:#aaa;border:1px solid #3c2414;}
 .ticker-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
 .my-card{background:var(--c);border:2px solid var(--g);border-radius:8px;padding:6px 10px;position:relative;transition:background .2s, border-color .2s;flex-shrink:0;}
 .badge{padding:2px 5px;border-radius:5px;font-weight:bold;font-size:0.75rem;}
-.hp-badge{background:var(--a);color:#fff;}
-.arrow-badge{background:#4a2f13;border:1px solid var(--g);color:var(--g);}
+.hp-badge{background:var(--a);color:#fff;} .arrow-badge{background:#4a2f13;border:1px solid var(--g);color:var(--g);}
 .role-reveal-box{display:block;background:#140c06;border:1px dashed var(--g);color:#bbb;padding:5px;border-radius:5px;font-size:0.78rem;font-weight:bold;margin-top:4px;text-align:center;cursor:pointer;touch-action:none;}
 .role-reveal-box.revealed{background:#4a2810;border-style:solid;color:var(--g);}
 .char-link{color:var(--g);text-decoration:underline dotted;cursor:pointer;font-weight:bold;}
 .turn-banner{background:var(--cl);border:1px solid var(--b);padding:4px;border-radius:6px;text-align:center;font-size:0.78rem;font-weight:bold;min-height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-
 .table-2d-wrap{width:100%;height:175px;min-height:175px;position:relative;margin:2px 0;touch-action:none;flex-shrink:0;}
 .table-2d-wrap.editing-mode{border:2px dashed var(--g);border-radius:10px;background:rgba(245,197,49,.05);}
 .table-2d-oval{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:115px;height:82px;background:#26160c;border:3px solid var(--b);border-radius:45px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:inset 0 0 10px rgba(0,0,0,.8);z-index:1;transition:.3s;}
@@ -58,23 +52,21 @@ button.small-btn{padding:3px 6px;font-size:0.72rem;border-radius:5px;}
 .seat-node.active-turn{border-color:var(--g);box-shadow:0 0 8px var(--g);background:#2f1f0e;}
 .seat-node.dead-seat{opacity:.35;border-color:#555;filter:grayscale(1);}
 .seat-node.drag-over{border-color:#fff;background:#44301a;transform:translate(-50%,-50%) scale(1.15);}
-
 #win-2d-table .seat-node.dead-seat{opacity:1!important;filter:none!important;border-color:#888!important;background:#24140b!important;}
 .seat-node.my-seat{border:2px solid #00ff66!important;box-shadow:0 0 10px rgba(0,255,102,.7)!important;background:#122912!important;}
 .my-seat-tag{color:#00ff66;font-weight:900;font-size:0.6rem;margin-left:2px;}
 .anim-layer{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:12;}
-
 @keyframes heartbeatPulse{0%{transform:translate(-50%,-50%) scale(1);border-color:#882222}14%{transform:translate(-50%,-50%) scale(1.12);border-color:#ff2200;box-shadow:0 0 12px #ff0000}28%{transform:translate(-50%,-50%) scale(1)}42%{transform:translate(-50%,-50%) scale(1.16);border-color:#ff2200;box-shadow:0 0 16px #ff0000}70%{transform:translate(-50%,-50%) scale(1)}100%{transform:translate(-50%,-50%) scale(1)}}
 .seat-node.low-hp-pulse{animation:heartbeatPulse 1.25s infinite ease-in-out;}
+@keyframes indianDangerPulse{0%{box-shadow:inset 0 0 8px #ff2200, 0 0 4px #ff3300;border-color:#ff2200;}50%{box-shadow:inset 0 0 20px #ff0000, 0 0 15px #ff5500;border-color:#ffff00;transform:translate(-50%,-50%) scale(1.05);}}
+.table-2d-oval.indian-critical{animation:indianDangerPulse 0.9s infinite alternate ease-in-out;}
 @keyframes arrowDangerPulse{0%{transform:scale(1);color:#ff5555}100%{transform:scale(1.12);color:#ff0000;text-shadow:0 0 12px #ff0000}}
 .danger-arrow-glow{animation:arrowDangerPulse .75s infinite alternate ease-in-out;}
-
 @keyframes dynWarningFlicker{0%,100%{box-shadow:inset 0 0 18px rgba(255,50,0,.45);border-color:rgba(255,80,0,.6);}50%{box-shadow:inset 0 0 45px rgba(255,20,0,.9),0 0 20px #ff3300;border-color:#ff2200;}}
 body.dyn-danger-warning{animation:dynWarningFlicker 0.75s infinite alternate ease-in-out;}
 .dyn-warning-badge{position:fixed;top:38px;left:50%;transform:translateX(-50%);background:#9e1c0c;border:2px solid #ffcc00;color:#fff;font-size:0.75rem;font-weight:bold;padding:4px 12px;border-radius:20px;box-shadow:0 0 12px #ff2200;z-index:9998;pointer-events:none;white-space:nowrap;animation:sparkFlicker .6s infinite ease-in-out;}
 @keyframes dynNodeSparkAnim{0%,100%{border-color:#ff5500;box-shadow:0 0 6px #ff3300;}50%{border-color:#ffff00;box-shadow:0 0 18px #ff2200;transform:translate(-50%,-50%) scale(1.12);}}
 .seat-node.dyn-danger-node{animation:dynNodeSparkAnim .6s infinite alternate ease-in-out;}
-
 .reorder-list{background:#120c08;border:1px solid var(--b);border-radius:6px;padding:6px;max-height:160px;overflow-y:auto;margin-bottom:6px;display:flex;flex-direction:column;gap:4px;}
 .cfg-card{display:flex;align-items:center;gap:5px;background:#1c130b;border:1px solid var(--b);border-radius:6px;padding:4px 6px;}
 .cfg-badge{font-size:0.72rem;font-weight:bold;color:var(--g);min-width:24px;text-align:center;flex-shrink:0;}
@@ -83,31 +75,25 @@ body.dyn-danger-warning{animation:dynWarningFlicker 0.75s infinite alternate eas
 .cfg-type-human{background:#422a13;color:var(--g);border-color:var(--g);}
 .cfg-type-bot{background:#132630;color:var(--host);border-color:var(--host);}
 .arrow-btn{background:var(--cl);color:var(--g);border:1px solid var(--b);padding:2px 6px;font-size:0.75rem;border-radius:4px;}
-
 .dice-area{display:flex;justify-content:space-between;gap:3px;margin:4px 0;}
 .die{flex:1;aspect-ratio:0.9;background:#fff;border:2px solid #bbb;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#111;cursor:pointer;text-align:center;padding:2px;transition:transform .15s;position:relative;}
 .die.locked{border-color:#ff3333;background:#ffcccc;opacity:.85;}
 .die.maxed{border-color:#777;background:#ddd;opacity:.8;}
 .die.selected-reroll{border-color:var(--g);background:#fff8dc;transform:translateY(-3px);box-shadow:0 0 6px var(--g);}
-.die-icon{font-size:1.15rem;}
-.die-label{font-size:0.56rem;font-weight:bold;}
-.die-sub{font-size:0.5rem;color:#555;font-weight:bold;}
+.die.used-spent{border-color:#666!important;background:#2a2018!important;color:#777!important;opacity:0.6!important;cursor:not-allowed!important;}
+.die.used-spent .die-sub{color:#ff4444!important;}
+.die-icon{font-size:1.15rem;} .die-label{font-size:0.56rem;font-weight:bold;} .die-sub{font-size:0.5rem;color:#555;font-weight:bold;}
 @keyframes sparkFlicker{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
 .dynamite-spark{position:absolute;top:-5px;right:3px;font-size:0.7rem;animation:sparkFlicker .4s infinite ease-in-out;pointer-events:none;}
-
 .actions-box{background:var(--cl);padding:6px;border-radius:6px;font-size:0.78rem;border:1px solid var(--b);margin-bottom:3px;flex-shrink:0;}
 .targets-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:4px;}
 .act-summary-bar{background:#120c08;border:1px solid var(--b);border-radius:5px;padding:3px 6px;margin-bottom:4px;display:flex;justify-content:space-between;font-size:0.7rem;color:var(--g);font-weight:bold;}
-
 .modal-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,.88);display:flex;justify-content:center;align-items:center;z-index:1000;padding:12px;}
 .modal-box{background:var(--c);border:2px solid var(--g);border-radius:10px;width:100%;max-width:420px;max-height:85vh;display:flex;flex-direction:column;padding:12px;}
 .history-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px;}
 .history-entry{background:#18100a;border-left:4px solid var(--b);padding:5px 8px;border-radius:4px;font-size:0.78rem;}
-.history-entry.damage{border-left-color:var(--dmg);}
-.history-entry.heal{border-left-color:var(--heal);}
-.history-entry.event{border-left-color:var(--g);}
+.history-entry.damage{border-left-color:var(--dmg);} .history-entry.heal{border-left-color:var(--heal);} .history-entry.event{border-left-color:var(--g);}
 .history-entry.round{background:#2a1b10;border-left-color:var(--g);text-align:center;font-weight:bold;color:var(--g);padding:4px;}
-
 @keyframes diceRollAnim{0%{transform:rotate(0)}25%{transform:rotate(12deg) scale(1.08)}50%{transform:rotate(-12deg) scale(.95)}75%{transform:rotate(8deg) scale(1.05)}100%{transform:rotate(0)}}
 .die.rolling{animation:diceRollAnim .35s ease-in-out;}
 @keyframes floatNumUp{0%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-34px) scale(1.25)}}
@@ -118,7 +104,6 @@ body.dyn-danger-warning{animation:dynWarningFlicker 0.75s infinite alternate eas
 .seat-node.hurt{animation:seatShakeHurt .45s ease-in-out;}
 @keyframes seatHealGlow{0%,100%{transform:translate(-50%,-50%)}50%{transform:translate(-50%,-50%) scale(1.15);box-shadow:0 0 16px #00ff66}}
 .seat-node.healed{animation:seatHealGlow .55s ease-in-out;}
-
 @keyframes crosshairZoom{0%{opacity:0;transform:translate(-50%,-50%) scale(2.2) rotate(45deg);}50%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0deg);}80%{opacity:1;transform:translate(-50%,-50%) scale(1.08);}100%{opacity:0;transform:translate(-50%,-50%) scale(0.8);}}
 .crosshair-target{position:absolute;font-size:1.6rem;color:#ff2200;text-shadow:0 0 8px #ff0000;pointer-events:none;z-index:29;animation:crosshairZoom 0.5s ease-out forwards;}
 @keyframes emoteFloatUp{0%{opacity:0;transform:translate(-50%,10px) scale(0.6)}20%{opacity:1;transform:translate(-50%,-16px) scale(1.25)}70%{opacity:1;transform:translate(-50%,-20px) scale(1)}100%{opacity:0;transform:translate(-50%,-35px) scale(0.8)}}
@@ -132,7 +117,6 @@ body.dynamite-shake{animation:screenDynShake .45s ease-in-out;}
 .bullet-line{position:absolute;height:4px;background:linear-gradient(90deg,transparent,#ffe066,#ff2200);transform-origin:0 50%;z-index:28;pointer-events:none;border-radius:3px;animation:bulletFade .45s forwards ease-out;}
 @keyframes bulletFade{0%{opacity:1}100%{opacity:0}}
 .flying-arrow{position:absolute;font-size:1.35rem;z-index:29;pointer-events:none;transition:all .5s cubic-bezier(.25,1,.5,1);}
-
 #ambush-layer{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:99999;display:none;}
 .ambush-bg{position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle,rgba(255,20,0,.65) 0%,rgba(130,0,0,.95) 80%);animation:ambushPulse 2.5s forwards ease-out;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;text-align:center;}
 @keyframes ambushPulse{0%{opacity:0}10%{opacity:1}85%{opacity:1}100%{opacity:0}}
@@ -164,7 +148,7 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
   <div style="display:flex;align-items:center;gap:4px;">
     <button id="btn-kick" class="danger small-btn hidden" onclick="openKickModal()">⚠️ Kirúgás</button>
     <button id="btn-reorder" class="secondary small-btn hidden" onclick="toggleReorderMode()">🪑 Átrendezés</button>
-    <h1>🤠 BANG! <span style="font-size:0.62rem;color:#00ff66;background:#052405;padding:1px 5px;border-radius:4px;border:1px solid #00aa44;">v2.9</span></h1>
+    <h1>🤠 BANG! <span style="font-size:0.62rem;color:#00ff66;background:#052405;padding:1px 5px;border-radius:4px;border:1px solid #00aa44;">v3.0</span></h1>
   </div>
   <div style="display:flex;align-items:center;gap:4px;">
     <span id="hdr-room-badge" style="background:#22150c;border:1px solid var(--b);color:var(--g);font-size:0.72rem;font-weight:bold;padding:2px 6px;border-radius:5px;">Szoba: <b id="hdr-room">----</b></span>
@@ -220,6 +204,10 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
       <input type="checkbox" id="local-rule" checked onchange="document.getElementById('local-switch-lbl').innerText=this.checked?'BE':'KI';saveLocalCfgState();">
     </div>
     <div class="switch-row">
+      <span><b>Gatling eldobja a nyilakat (hivatalos szabály)</b><br><small id="local-gatling-arrows-lbl" style="color:#aaa;">KI</small></span>
+      <input type="checkbox" id="local-gatling-arrows" onchange="document.getElementById('local-gatling-arrows-lbl').innerText=this.checked?'BE':'KI';saveLocalCfgState();">
+    </div>
+    <div class="switch-row">
       <span><b>Kézi szerepbeállítás (1 fő)</b><br><small id="local-fix-lbl" style="color:#aaa;">KIKAPCSOLVA</small></span>
       <input type="checkbox" id="local-fix-toggle" onchange="toggleLocalFixedRole(this.checked)">
     </div>
@@ -272,7 +260,11 @@ body.hit-by-bullet{animation:playerHitBorderFlash .7s ease-out;}
       </div>
       <div class="switch-row" id="host-switch-box">
         <span><b>Újradobási keret: max 3 kocka (B opció)</b><br><small id="switch-status" style="color:var(--g);">BE</small></span>
-        <input type="checkbox" id="lobby-rule" checked onchange="toggleLobbyRule(this.checked)">
+        <input type="checkbox" id="lobby-rule" checked onchange="toggleHostRule(this.checked)">
+      </div>
+      <div class="switch-row" id="host-gatling-box">
+        <span><b>Gatling eldobja a nyilakat (hivatalos szabály)</b><br><small id="lobby-gatling-arrows-lbl" style="color:#aaa;">KI</small></span>
+        <input type="checkbox" id="lobby-gatling-arrows" onchange="toggleHostGatlingArrows(this.checked)">
       </div>
       <div class="switch-row" id="host-fix-row">
         <span><b>Kézi szerepbeállítás (1 fő)</b><br><small id="lobby-fix-status" style="color:#aaa;">KIKAPCSOLVA</small></span>
@@ -519,7 +511,6 @@ function triggerVib(pattern){
   if(navigator.vibrate) try{ navigator.vibrate(pattern); }catch(e){}
 }
 
-/* PRÉMIUM AKUSZTIKUS HANGOK */
 function playSound(type){
   if(isMuted||!audioCtx) return;
   try{
@@ -530,7 +521,6 @@ function playSound(type){
       gain.gain.setValueAtTime(0.5,now); gain.gain.exponentialRampToValueAtTime(0.01,now+0.05);
       osc.connect(gain); gain.connect(audioCtx.destination); osc.start(now); osc.stop(now+0.05);
     } else if(type==='turn'){
-      // Western zsebóra-harangjáték
       [880, 1320].forEach((freq, idx)=>{
         const osc=audioCtx.createOscillator(), gain=audioCtx.createGain();
         osc.type='sine'; osc.frequency.setValueAtTime(freq, now+idx*0.12);
@@ -637,7 +627,6 @@ function toggleReorderMode(){
 
 let dragSrcIdx=null, lastSeatTapIdx=null, seatTapTimer=null;
 
-/* 2D ASZTAL: HÁZIGAZDÁNÁL NINCS KORONA ÉS KÉK SZÍN */
 function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, allowDrag=false, revealAll=false){
   const c=document.getElementById(containerId); if(!c) return;
   const nodesToRemove=c.querySelectorAll('.seat-node, .table-2d-oval');
@@ -645,6 +634,8 @@ function render2DTable(containerId, players, activeIdx, dir, isLiveGame=true, al
 
   const oval=document.createElement('div'); oval.className='table-2d-oval';
   const pool=G?G.pool:9;
+  
+  if(pool<=2) oval.classList.add('indian-critical');
   const dangerClass=(pool<=3)?'danger-arrow-glow':'';
   oval.innerHTML=`<span class="${dangerClass}" style="font-size:0.75rem;">🏹 <b>${pool}</b>/9</span>
   <span style="font-size:1.1rem;color:var(--g);">${dir===1?'↻':'↺'}</span>
@@ -836,7 +827,6 @@ function triggerArrowFlyAnim(targetIdx, reverse=false){
   setTimeout(()=>arr.remove(),500);
 }
 
-/* INDIÁNTÁMADÁS: 0,4 MP / SÉRÜLT JÁTÉKOS AZONNALI HP LEVONÁSSAL */
 function triggerAmbushSequence(callback){
   playSound('ambush');
   const layer=document.getElementById('ambush-layer');
@@ -1059,14 +1049,13 @@ function hostReturnToLobby(){
     showView('local-setup'); renderLocalCfg();
   } else if(isHost){
     G.phase='LOBBY'; G.pool=9; G.rnd=1; G.act=0; G.hist=[];
-    G.dice=Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0}));
+    G.dice=Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,used:false,rerolls:0}));
     G.pending={s1:0,s2:0,beer:0,kitArrows:0}; G.actType=null;
     G.players.forEach(p=>{p.alive=true;p.arrows=0;p.role='';p.hp=8;p.maxHp=8;});
     bcast();
   }
 }
 
-/* OFFLINE SETUP */
 let localCfg=[{n:"1. Játékos",bot:false,isHost:true},{n:"2. Játékos",bot:false,isHost:false},{n:"3. Bot",bot:true,isHost:false},{n:"4. Bot",bot:true,isHost:false}];
 let localDir=1, localFixedRole={active:false,playerIdx:0,role:'Seriff'};
 
@@ -1075,7 +1064,8 @@ function saveLocalCfgState(){
     localStorage.setItem('bang_offline_cfg',JSON.stringify({
       cfg:localCfg, dir:localDir,
       hideDead:document.getElementById('local-hide-dead').checked,
-      rule:document.getElementById('local-rule').checked
+      rule:document.getElementById('local-rule').checked,
+      gatlingArrows:document.getElementById('local-gatling-arrows').checked
     }));
   }catch(e){}
 }
@@ -1089,6 +1079,8 @@ function loadLocalCfgState(){
       document.getElementById('local-dead-lbl').innerText=(d.hideDead!==false)?'BE':'KI';
       document.getElementById('local-rule').checked=d.rule!==false;
       document.getElementById('local-switch-lbl').innerText=(d.rule!==false)?'BE':'KI';
+      document.getElementById('local-gatling-arrows').checked=d.gatlingArrows===true;
+      document.getElementById('local-gatling-arrows-lbl').innerText=d.gatlingArrows===true?'BE':'KI';
       document.getElementById('btn-dir-local').innerText=localDir===1?'↻ Jobbra':'↺ Balra';
     }
   }catch(e){}
@@ -1184,15 +1176,16 @@ function startLocalGame(){
     return {id:i,peerId:`loc-${i}`,name:c.n.trim()||`P${i+1}`,isBot:c.bot,isHost:c.isHost,role:r,character:ch,hp,maxHp:hp,arrows:0,alive:true};
   });
   G={room:'OFFLINE',phase:'GAME',dir:localDir,hideDead:document.getElementById('local-hide-dead').checked,
-     rule:document.getElementById('local-rule').checked,players,pool:9,rnd:1,
+     rule:document.getElementById('local-rule').checked,
+     gatlingDiscardsArrows:document.getElementById('local-gatling-arrows').checked,
+     players,pool:9,rnd:1,
      act:players.findIndex(p=>p.role==='Seriff'),isInit:true,rolls:0,maxRolls:3,budget:3,maxBudget:3,
      gringoHit:false,gatlingFired:false,gatlingDeclinedThisTurn:false,slabUsedBeer:false,isResolving:false,
-     dice:Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0})),pending:{s1:0,s2:0,beer:0,kitArrows:0},actType:null,hist:[]};
+     dice:Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,used:false,rerolls:0})),pending:{s1:0,s2:0,beer:0,kitArrows:0},actType:null,hist:[]};
   log(`🎮 Játék indult! Seriff: <b>${G.players[G.act].name}</b>`,'event');
   initTurn();
 }
 
-/* ONLINE (GOOGLE STUN SZERVERREL ÉS GYORS RECONNECTTEL) */
 function saveHostSession(){
   if(isHost&&G&&G.phase==='GAME') localStorage.setItem('bang_host_session',JSON.stringify({room,G,myName}));
 }
@@ -1234,10 +1227,10 @@ function initHostLobby(){
   document.getElementById('btn-start-online').classList.remove('hidden');
   const u=`https://muttyer-creator.github.io/Kocka-BANG/?room=${room}`;
   document.getElementById('lobby-qr-img').src=`https://api.qrserver.com/v1/create-qr-code/?size=110x110&data=${encodeURIComponent(u)}`;
-  G={room,phase:'LOBBY',dir:1,hideDead:true,rule:true,fixedRole:{active:false,playerIdx:0,role:'Seriff'},
+  G={room,phase:'LOBBY',dir:1,hideDead:true,rule:true,gatlingDiscardsArrows:false,fixedRole:{active:false,playerIdx:0,role:'Seriff'},
      players:[{id:0,peerId:myId,name:myName,isHost:true,isBot:false}],pool:9,rnd:1,act:0,isInit:true,rolls:0,maxRolls:3,budget:3,maxBudget:3,
      gringoHit:false,gatlingFired:false,gatlingDeclinedThisTurn:false,slabUsedBeer:false,isResolving:false,
-     dice:Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0})),pending:{s1:0,s2:0,beer:0,kitArrows:0},actType:null,hist:[]};
+     dice:Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,used:false,rerolls:0})),pending:{s1:0,s2:0,beer:0,kitArrows:0},actType:null,hist:[]};
   renderLobby();
 }
 function toggleHostDir(){
@@ -1246,7 +1239,8 @@ function toggleHostDir(){
   renderLobby(); bcast();
 }
 function toggleHostHideDead(c){ if(!isHost)return; G.hideDead=c; document.getElementById('lobby-dead-status').innerText=c?'BE':'KI'; bcast(); }
-function toggleLobbyRule(c){ if(!isHost)return; G.rule=c; document.getElementById('switch-status').innerText=c?'BE':'KI'; bcast(); }
+function toggleHostRule(c){ if(!isHost)return; G.rule=c; document.getElementById('switch-status').innerText=c?'BE':'KI'; bcast(); }
+function toggleHostGatlingArrows(c){ if(!isHost)return; G.gatlingDiscardsArrows=c; document.getElementById('lobby-gatling-arrows-lbl').innerText=c?'BE':'KI'; bcast(); }
 function toggleHostFixedRole(c){
   if(!isHost)return; G.fixedRole.active=c;
   document.getElementById('lobby-fix-status').innerText=c?'BE':'KIKAPCSOLVA';
@@ -1340,6 +1334,7 @@ function renderLobby(){
       <div>• <b>Kör iránya:</b> ${G.dir===1?'Jobbra ↻':'Balra ↺'}</div>
       <div>• <b>Halottak szerepe:</b> ${G.hideDead?'Titkos a végéig':'Azonnal felfedve'}</div>
       <div>• <b>Szabály:</b> ${G.rule?'B opció (max 3 kocka keret)':'Klasszikus (3 kör)'}</div>
+      <div>• <b>Gatling eldobja a nyilakat:</b> ${G.gatlingDiscardsArrows?'BE':'KI (alapértelmezett)'}</div>
     `;
   }
 }
@@ -1492,7 +1487,6 @@ function applyManualRoleAssignments(){
   mode==='LOCAL'?sync():bcast();
 }
 
-/* JÁTÉK ÉS KOCKA LOGIKA */
 function getRoles(n){
   let r=['Seriff','Bandita','Renegát'];
   if(n===4) r=['Seriff','Renegát','Bandita','Bandita'];
@@ -1530,7 +1524,7 @@ function initTurn(){
   G.isInit=true; G.rolls=0; G.maxRolls=cp.character.n==="Lucky Duke"?4:3;
   G.maxBudget=cp.character.n==="Lucky Duke"?4:3; G.budget=G.maxBudget;
   G.gringoHit=false; G.gatlingFired=false; G.gatlingDeclinedThisTurn=false; G.slabUsedBeer=false; G.isResolving=false;
-  G.dice=Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,rerolls:0}));
+  G.dice=Array(5).fill(0).map(()=>({face:null,sel:false,locked:false,used:false,rerolls:0}));
   G.pending={s1:0,s2:0,beer:0,kitArrows:0}; G.actType=null; G.pendingBart=null;
 
   log(`--- 🤠 <b>${cp.name}</b> köre kezdődik ---`, 'round');
@@ -1584,7 +1578,6 @@ function proceedLocalTurn(){
   initAudio(); document.getElementById('view-pass').classList.add('hidden'); myId=G.players[G.act].peerId; sync();
 }
 
-/* JAVÍTOTT HANDLEACT: BART CASSIDY DÖNTÉSE MINDIG ÁTMEGY! */
 function handleAct(a,sp){
   const isBartActor = a.t === 'BART_CHOICE' && G.pendingBart && G.players[G.pendingBart.tIdx]?.peerId === sp;
   if(isAmbushLock || G.phase !== 'GAME' || (G.players[G.act].peerId !== sp && !isBartActor)) return;
@@ -1592,7 +1585,7 @@ function handleAct(a,sp){
   if(a.t==='SID_CHOICE') applySidChoice(a.id);
   else if(a.t==='SKIP_SID') skipSidChoice();
   else if(a.t==='ROLL') doRoll();
-  else if(a.t==='TOGGLE_DIE'){ const d=G.dice[a.i]; if(d&&!d.locked) d.sel=!d.sel; mode==='LOCAL'?sync():bcast(); }
+  else if(a.t==='TOGGLE_DIE'){ const d=G.dice[a.i]; if(d&&!d.locked&&!d.used) d.sel=!d.sel; mode==='LOCAL'?sync():bcast(); }
   else if(a.t==='QUICK_REROLL') quickRerollSingleDie(a.i);
   else if(a.t==='RESOLVE') startResolve();
   else if(a.t==='CANCEL_RESOLVE') cancelResolve();
@@ -1644,6 +1637,7 @@ function doResolveClick(){ sendAct({t:'RESOLVE'}); }
 let lastDieTapIdx=null, dieTapTimer=null;
 function onDieClick(idx){
   initAudio(); if(G.isInit) return;
+  const d=G.dice[idx]; if(!d||d.used) return;
   playSound('click');
   if(lastDieTapIdx===idx){
     clearTimeout(dieTapTimer); lastDieTapIdx=null; sendAct({t:'QUICK_REROLL',i:idx});
@@ -1652,16 +1646,17 @@ function onDieClick(idx){
   }
 }
 function quickRerollSingleDie(i){
-  const d=G.dice[i]; if(!d||d.locked) return;
+  const d=G.dice[i]; if(!d||d.locked||d.used) return;
   if(G.rule){
     if(d.rerolls>=2||G.budget<=0) return;
     const spent=G.maxBudget-G.budget;
     if(spent+1>=3&&d.rerolls>0){ alert('A 3. újradobás csak szűz kocka lehet!'); return; }
   }
-  G.dice.forEach(x=>x.sel=false); d.sel=true; doRoll();
+  G.dice.forEach(x=>{ if(!x.used&&!x.locked) x.sel=false; });
+  d.sel=true; doRoll();
 }
 function clientToggleDie(i){
-  if(G.isInit) return; const d=G.dice[i]; if(d.locked) return;
+  if(G.isInit) return; const d=G.dice[i]; if(d.locked||d.used) return;
   if(G.rule){
     if(d.rerolls>=2){ alert('Már 2-szer újradobtad!'); return; }
     if(!d.sel){
@@ -1674,9 +1669,11 @@ function clientToggleDie(i){
   sendAct({t:'TOGGLE_DIE',i});
 }
 function cancelResolveToRoll(){ sendAct({t:'CANCEL_RESOLVE'}); }
+
 function cancelResolve(){
-  G.actType=null; G.isResolving=false; G.pending={s1:0,s2:0,beer:0,kitArrows:0};
-  mode==='LOCAL'?sync():bcast(); toast('↩️ Visszatértél a dobáshoz!');
+  G.actType=null; G.isResolving=false;
+  mode==='LOCAL'?sync():bcast();
+  toast('↩️ Visszatértél a dobáshoz! A megmaradt kockáidat újradobhatod.');
 }
 
 function doRoll(){
@@ -1689,13 +1686,13 @@ function doRoll(){
   if(G.isInit){
     G.isInit=false; G.rolls=1;
     for(let d of G.dice){
-      d.face=F[Math.floor(Math.random()*F.length)]; d.rerolls=0; d.sel=false;
+      d.face=F[Math.floor(Math.random()*F.length)]; d.rerolls=0; d.sel=false; d.used=false;
       if(d.face.id==='arrow') arrowCount++;
       else if(d.face.id==='dynamite'&&cp.character.n!=="Black Jack") d.locked=true;
     }
   } else {
     if(G.rule){
-      const toR=G.dice.filter(d=>d.sel&&!d.locked&&d.rerolls<2);
+      const toR=G.dice.filter(d=>d.sel&&!d.locked&&!d.used&&d.rerolls<2);
       if(!toR.length||toR.length>G.budget) return;
       G.budget-=toR.length;
       for(let d of toR){
@@ -1705,7 +1702,7 @@ function doRoll(){
       }
     } else {
       if(G.rolls>=G.maxRolls) return;
-      const toR=G.dice.filter(d=>d.sel&&!d.locked); if(!toR.length) return;
+      const toR=G.dice.filter(d=>d.sel&&!d.locked&&!d.used); if(!toR.length) return;
       for(let d of toR){
         d.face=F[Math.floor(Math.random()*F.length)]; d.rerolls++; d.sel=false;
         if(d.face.id==='arrow') arrowCount++;
@@ -1778,7 +1775,7 @@ function continueBotTurn(tId){
   const wantBeer=curr.hp<=3||(curr.role==='Helyettes'&&sheriff&&sheriff.hp<=4);
   let s=0;
   G.dice.forEach(d=>{
-    if(d.locked||(G.rule&&d.rerolls>=2)) return;
+    if(d.locked||d.used||(G.rule&&d.rerolls>=2)) return;
     const keep=(d.face.id==='beer'&&wantBeer)||(d.face.id==='gatling')||(d.face.id.startsWith('shoot')&&curr.role==='Bandita');
     const maxS=G.rule?G.budget:5;
     if(!keep&&s<maxS){
@@ -1794,11 +1791,11 @@ function checkMidTurnGatling(){
   const cp=G.players[G.act];
   if(G.gatlingFired || G.gatlingDeclinedThisTurn) return;
 
-  const unconsumedGatling = G.dice.filter(d => d.face && d.face.id === 'gatling' && !d.locked).length;
+  const unconsumedGatling = G.dice.filter(d => d.face && d.face.id === 'gatling' && !d.locked && !d.used).length;
   const reqG = cp.character.n==="Willy the Kid"?2:3;
 
   if(unconsumedGatling >= reqG){
-    const canReroll = G.rule?(G.budget>0&&G.dice.some(d=>!d.locked&&d.rerolls<2)):(G.rolls<G.maxRolls&&G.dice.some(d=>!d.locked));
+    const canReroll = G.rule?(G.budget>0&&G.dice.some(d=>!d.locked&&!d.used&&d.rerolls<2)):(G.rolls<G.maxRolls&&G.dice.some(d=>!d.locked&&!d.used));
     G.actType = canReroll ? 'askGatling' : 'forceGatling';
   } else {
     if(G.actType==='askGatling'||G.actType==='forceGatling') G.actType=null;
@@ -1808,27 +1805,33 @@ function checkMidTurnGatling(){
 function fireGatling(){
   const cp=G.players[G.act]; G.gatlingFired=true;
   triggerGatlingSweep(); bcastAnim({type:'GATLING'});
-  log(`💥 <b>${cp.name}</b> elsütötte a Gatlingot! (-1 HP mindenkinek)`,'damage');
   
   let consumed=0; const reqG=cp.character.n==="Willy the Kid"?2:3;
   G.dice.forEach(d=>{
-    if(d.face && d.face.id==='gatling' && !d.locked && consumed<reqG){
+    if(d.face && d.face.id==='gatling' && !d.locked && !d.used && consumed<reqG){
       d.locked=true;
+      d.used=true;
       consumed++;
     }
   });
 
   G.players.forEach((p,i)=>{
     if(i!==G.act&&p.alive&&p.character.n!=="Paul Regret") dmgP(i,1,G.act,`💥 ${cp.name} Gatlingja végzett a Seriffel!`,false);
-    if(cp.character.n==="Kit Carlson"&&p.arrows>0){
-      triggerArrowFlyAnim(i,true); bcastAnim({type:'ARROW',target:i,rev:true});
-      G.pool+=p.arrows; p.arrows=0;
-    }
   });
-  G.pool+=cp.arrows; cp.arrows=0; G.actType=null;
+
+  if(G.gatlingDiscardsArrows){
+    const droppedCount = cp.arrows;
+    G.pool += cp.arrows;
+    cp.arrows = 0;
+    log(`💥 <b>${cp.name}</b> elsütötte a Gatlingot! (-1 HP mindenkinek, ÉS eldobta a nyilait: ${droppedCount} db visszament a készletbe!)`, 'damage');
+  } else {
+    log(`💥 <b>${cp.name}</b> elsütötte a Gatlingot! (-1 HP mindenkinek)`, 'damage');
+  }
+
+  G.actType=null;
   if(checkEnd(`💥 ${cp.name} Gatlingja végzett a Seriffel!`)) return;
 
-  const canReroll=G.rule?(G.budget>0&&G.dice.some(d=>!d.locked&&d.rerolls<2)):(G.rolls<G.maxRolls&&G.dice.some(d=>!d.locked));
+  const canReroll=G.rule?(G.budget>0&&G.dice.some(d=>!d.locked&&!d.used&&d.rerolls<2)):(G.rolls<G.maxRolls&&G.dice.some(d=>!d.locked&&!d.used));
   if(cp.isBot&&(mode==='LOCAL'||isHost)){
     const thisTurnId=currentTurnId;
     botTimer=setTimeout(()=>{ if(thisTurnId===currentTurnId) startResolve(); },700);
@@ -1844,7 +1847,7 @@ function dmgP(idx,d,att=null,causeOverride='',silent=false){
   
   if(p.character.n==="Pedro Ramirez"&&p.arrows>0){ p.arrows--; G.pool++; log(`🪶 <b>${p.name}</b> eldobott 1 nyilat!`,'event'); }
   
-  if(p.character.n==="El Gringo" && att!==null && att!==idx){
+  if(p.character.n==="El Gringo" && att!==null && att!==idx && G.pool>0){
     log(`🌵 <b>${p.name}</b> képessége: a támadó (<b>${G.players[att].name}</b>) kapott 1 nyilat!`, 'damage');
     takeArrow(att);
   }
@@ -1867,8 +1870,14 @@ function dmgP(idx,d,att=null,causeOverride='',silent=false){
 function startResolve(){
   const cp=G.players[G.act]; if(!cp||!cp.alive){ endTurn(); return; }
   G.isResolving=true;
+  
   let c={arrow:0,dynamite:0,shoot1:0,shoot2:0,beer:0,gatling:0};
-  G.dice.forEach(d=>{if(d.face)c[d.face.id]++;});
+  G.dice.forEach(d=>{
+    if(d.face && !d.used && !d.locked){
+      c[d.face.id]++;
+    }
+  });
+
   const reqG=cp.character.n==="Willy the Kid"?2:3;
   if(c.gatling>=reqG&&!G.gatlingFired){ fireGatling(); return; }
   if(cp.character.n==="Suzy Lafayette"&&!c.shoot1&&!c.shoot2){
@@ -1918,7 +1927,6 @@ function resolveStep(){
   }
 }
 
-/* BART CASSIDY DÖNTÉSE ÉS LÖVÉSSZÁMLÁLÓ CSÖKKENTÉSE */
 function applyTarget(tIdx, isDbl=false){
   const cp=G.players[G.act]; if(!cp||!cp.alive){ endTurn(); return; }
   const a=cp.name, t=G.players[tIdx].name;
@@ -1926,17 +1934,20 @@ function applyTarget(tIdx, isDbl=false){
   
   if(isDbl && G.pending.beer>0){
     G.pending.beer--; G.slabUsedBeer=true;
+    lockFirstMatchingDie('beer');
     log(`💥 <b>${a}</b> feláldozott 1 Sört a dupla sebzésért (2 HP)!`,'damage');
   }
 
   const currentShotType = G.actType;
   const targetP=G.players[tIdx];
 
+  lockFirstMatchingDie(currentShotType);
+
   if(targetP.character.n==="Bart Cassidy"&&G.pool>=dmgAmount&&currentShotType.startsWith('shoot')){
     if(targetP.isBot){
       if(targetP.hp<=3&&G.pool>dmgAmount){
         targetP.arrows+=dmgAmount; G.pool-=dmgAmount;
-        log(`🏹 <b>Bart Cassidy (Bot)</b> felvett ${dmgAmount} nyilat életvesztés helyett!`,'event');
+        log(`🏹 <b>Bart Cassidy (Bot)</b> felvett ${dmgAmount} nyilat <b>${a}</b> lövése helyett!`,'event');
         triggerArrowFlyAnim(tIdx); bcastAnim({type:'ARROW',target:tIdx,rev:false});
       } else dealShootDamage(tIdx,dmgAmount,a,t);
       finalizeShotAction(currentShotType);
@@ -1950,11 +1961,21 @@ function applyTarget(tIdx, isDbl=false){
   finalizeShotAction(currentShotType);
 }
 
+function lockFirstMatchingDie(faceId){
+  const d = G.dice.find(die => die.face && die.face.id === faceId && !die.used);
+  if(d){
+    d.used = true;
+    d.locked = true;
+    d.sel = false;
+  }
+}
+
 function dealShootDamage(tIdx, dmgAmount, a, t){
   triggerVib(90);
   if(G.actType==='shoot1'||G.pendingBart?.shotType==='shoot1'){ log(`🎯1 <b>${a}</b> ➔ <b>${t}</b> (-${dmgAmount} HP)`,'damage'); dmgP(tIdx,dmgAmount,G.act,`🎯1 ${a} lövése végzett a Seriffel!`,false); }
   else if(G.actType==='shoot2'||G.pendingBart?.shotType==='shoot2'){ log(`🎯2 <b>${a}</b> ➔ <b>${t}</b> (-${dmgAmount} HP)`,'damage'); dmgP(tIdx,dmgAmount,G.act,`🎯2 ${a} távoli lövése végzett a Seriffel!`,false); }
   else if(G.actType==='beer'){
+    lockFirstMatchingDie('beer');
     const isJesse=(G.players[tIdx].character.n==="Jesse Jones"&&G.players[tIdx].hp<=4&&tIdx===G.act);
     const h=isJesse?2:1;
     G.players[tIdx].hp=Math.min(G.players[tIdx].maxHp,G.players[tIdx].hp+h);
@@ -1979,7 +2000,7 @@ function applyBartChoice(takeArrowChoice){
   const targetP=G.players[tIdx];
   if(takeArrowChoice&&G.pool>=dmgAmount){
     targetP.arrows+=dmgAmount; G.pool-=dmgAmount;
-    log(`🏹 <b>Bart Cassidy</b> felvett ${dmgAmount} nyilat életvesztés helyett!`,'event');
+    log(`🏹 <b>Bart Cassidy</b> felvett ${dmgAmount} nyilat <b>${attackerName}</b> lövése helyett!`,'event');
     triggerArrowFlyAnim(tIdx); bcastAnim({type:'ARROW',target:tIdx,rev:false});
   } else dealShootDamage(tIdx,dmgAmount,attackerName,targetName);
   
@@ -1994,17 +2015,10 @@ function applyKitArrowTarget(tIdx){
     triggerArrowFlyAnim(tIdx,true); bcastAnim({type:'ARROW',target:tIdx,rev:true});
     log(`🪶 <b>Kit Carlson</b> eldobott 1 nyilat tőle: <b>${target.name}</b>`,'event');
   }
-  let lockedKit = false;
-  G.dice.forEach(d => {
-    if(!lockedKit && d.face && d.face.id === 'gatling' && !d.locked){
-      d.locked = true;
-      lockedKit = true;
-    }
-  });
+  lockFirstMatchingDie('gatling');
   G.pending.kitArrows=Math.max(0,G.pending.kitArrows-1); resolveStep();
 }
 
-/* BOT AI */
 function botTurn(tId){
   if(tId!==currentTurnId||!G||G.phase!=='GAME'||isAmbushLock) return;
   const cp=G.players[G.act]; if(!cp||!cp.isBot||!cp.alive) return;
@@ -2040,7 +2054,6 @@ function botAction(tId){
   }
 }
 
-/* JAVÍTOTT ROSE DOOLAN ÉS TÁVOLSÁGOK */
 function getTargets(dist){
   const circle=G.players.filter(p=>p.alive), cLen=circle.length;
   if(cLen<=1) return [];
@@ -2149,7 +2162,6 @@ function openArchive(){
 }
 function clearArc(){ if(confirm('Törlöd?')){ localStorage.removeItem('bang_a'); openArchive(); } }
 
-/* SZŰRHETŐ ESEMÉNYNAPLÓ */
 function openHistory(ch=null){
   window.currentHistSource = ch;
   renderHistFiltered(currentHistFilter);
@@ -2186,7 +2198,6 @@ function renderHistFiltered(filterType){
   });
 }
 
-/* SYNC ÉS UI */
 function sync(){
   if(!G) return;
 
@@ -2201,6 +2212,8 @@ function sync(){
     document.getElementById('lobby-hide-dead').checked=G.hideDead;
     document.getElementById('switch-status').innerText=G.rule?'BE':'KI';
     document.getElementById('lobby-rule').checked=G.rule;
+    document.getElementById('lobby-gatling-arrows').checked=G.gatlingDiscardsArrows===true;
+    document.getElementById('lobby-gatling-arrows-lbl').innerText=G.gatlingDiscardsArrows===true?'BE':'KI';
     document.getElementById('lobby-fix-status').innerText=G.fixedRole&&G.fixedRole.active?'BE':'KIKAPCSOLVA';
     document.getElementById('lobby-fix-toggle').checked=G.fixedRole&&G.fixedRole.active;
     document.getElementById('lobby-fix-panel').classList.toggle('hidden',!(G.fixedRole&&G.fixedRole.active));
@@ -2302,7 +2315,7 @@ function sync(){
     if(G.isInit){ bR.classList.remove('hidden'); bR.innerText='Kezdeti dobás 🎲'; bRes.classList.add('hidden'); }
     else{
       const sel=G.dice.filter(d=>d.sel).length; bR.innerText=sel?`Kijelöltek újradobása (${sel} db) 🎲`:'Újradobás 🎲';
-      const can=G.rule?(G.budget>0&&G.dice.some(d=>!d.locked&&d.rerolls<2)):(G.rolls<G.maxRolls&&G.dice.some(d=>!d.locked));
+      const can=G.rule?(G.budget>0&&G.dice.some(d=>!d.locked&&!d.used&&d.rerolls<2)):(G.rolls<G.maxRolls&&G.dice.some(d=>!d.locked&&!d.used));
       bR.classList.toggle('hidden',!can); bRes.classList.remove('hidden');
     }
   } else ctrls.classList.add('hidden');
@@ -2313,14 +2326,20 @@ function sync(){
 function renderDice(isMe){
   const b=document.getElementById('dice-box'); b.innerHTML='';
   G.dice.forEach((d,i)=>{
-    const mx=G.rule&&d.rerolls>=2, el=document.createElement('div');
-    el.className=`die ${d.locked?'locked':''} ${mx?'maxed':''} ${d.sel?'selected-reroll':''}`;
-    const spark=(d.locked&&d.face&&d.face.id==='dynamite')?'<span class="dynamite-spark">✨</span>':'';
+    const mx=G.rule&&d.rerolls>=2;
+    const el=document.createElement('div');
+    el.className=`die ${d.locked?'locked':''} ${mx?'maxed':''} ${d.sel?'selected-reroll':''} ${d.used?'used-spent':''}`;
+    const spark=(d.locked&&!d.used&&d.face&&d.face.id==='dynamite')?'<span class="dynamite-spark">✨</span>':'';
     if(d.face){
-      let sub='✅ Megtartva'; if(d.locked) sub='🧨 Zárva'; else if(mx) sub='🔒 Max (2/2)';
-      else if(d.sel) sub='🎲 ÚJRADOBOD'; else if(G.rule&&d.rerolls>0) sub=`(${d.rerolls}/2)`;
+      let sub='✅ Megtartva';
+      if(d.used) sub='🔒 Elsütve';
+      else if(d.locked) sub='🧨 Zárva';
+      else if(mx) sub='🔒 Max (2/2)';
+      else if(d.sel) sub='🎲 ÚJRADOBOD';
+      else if(G.rule&&d.rerolls>0) sub=`(${d.rerolls}/2)`;
+      
       el.innerHTML=`${spark}<span class="die-icon">${d.face.i}</span><span class="die-label">${d.face.n}</span><span class="die-sub">${sub}</span>`;
-      if(isMe&&!G.isInit&&!isAmbushLock) el.onclick=()=>onDieClick(i);
+      if(isMe && !G.isInit && !isAmbushLock && !d.used) el.onclick=()=>onDieClick(i);
     } else el.innerHTML=`<span class="die-icon">🎲</span><span class="die-sub">Vár</span>`;
     b.appendChild(el);
   });
@@ -2377,6 +2396,7 @@ function renderActPanel(isMe){
       p.classList.remove('hidden');
       m.innerHTML=`🏹 <b>Bart Cassidy képesség aktiválható:</b><br>
         <div style="background:#140c06;padding:4px 6px;border-radius:5px;margin:4px 0;font-size:0.75rem;color:#ddd;">
+          • Támadó: <b style="color:var(--g);">${G.pendingBart.attackerName}</b> rád lőtt (-${G.pendingBart.dmgAmount} HP)!<br>
           • Életed: <b style="color:var(--a);">${myP.hp}/${myP.maxHp} HP</b><br>
           • Nálad lévő nyilak: <b style="color:var(--g);">${myP.arrows} db</b><br>
           • Készletben maradt nyilak: <b style="color:var(--g);">${G.pool} db</b>
@@ -2395,7 +2415,7 @@ function renderActPanel(isMe){
   p.classList.remove('hidden');
 
   const cancelBtn=document.getElementById('btn-cancel-resolve');
-  const canReturnToRoll=G.rule?(G.budget>0&&G.dice.some(d=>!d.locked&&d.rerolls<2)):(G.rolls<G.maxRolls&&G.dice.some(d=>!d.locked));
+  const canReturnToRoll=G.rule?(G.budget>0&&G.dice.some(d=>!d.locked&&!d.used&&d.rerolls<2)):(G.rolls<G.maxRolls&&G.dice.some(d=>!d.locked&&!d.used));
   cancelBtn.classList.toggle('hidden',!canReturnToRoll||G.actType.includes('Gatling'));
 
   if(G.actType==='askGatling'){
